@@ -68,7 +68,6 @@ public class TezosMetadata extends BaseTezosMetadata {
                 switch (columnName) {
                     case "block_number":
                     case "tx_blockNumber":
-                    case "erc20_blockNumber":
                         // Limit query to block number range
                         orderedRanges.forEach(r -> {
                             Marker low = r.getLow();
@@ -155,13 +154,6 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("tx_gas", DoubleType.DOUBLE));
             builder.add(new Pair<>("tx_gasPrice", DoubleType.DOUBLE));
             builder.add(new Pair<>("tx_input", VarcharType.VARCHAR));
-        } else if (TezosTable.ERC20.getName().equals(table)) {
-            builder.add(new Pair<>("erc20_token", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("erc20_from", VarcharType.createVarcharType(H20_BYTE_HASH_STRING_LENGTH)));
-            builder.add(new Pair<>("erc20_to", VarcharType.createVarcharType(H20_BYTE_HASH_STRING_LENGTH)));
-            builder.add(new Pair<>("erc20_value", DoubleType.DOUBLE));
-            builder.add(new Pair<>("erc20_txHash", VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH)));
-            builder.add(new Pair<>("erc20_blockNumber", BigintType.BIGINT));
         } else {
             throw new IllegalArgumentException("Unknown Table Name " + table);
         }

@@ -1,9 +1,6 @@
 package nl.utwente.presto.tezos;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import nl.utwente.presto.tezos.erc20.TezosERC20Token;
-import nl.utwente.presto.tezos.erc20.TezosERC20Utils;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import io.airlift.log.Logger;
 import org.web3j.protocol.Web3j;
@@ -12,7 +9,6 @@ import org.web3j.protocol.core.methods.response.Log;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -33,7 +29,6 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
         this.table = table;
 
-        // TODO: handle failure upstream
         this.block = requireNonNull(block, "block is null");
         this.blockIter = ImmutableList.of(block).iterator();
         this.txIter = block.getBlock().getTransactions().iterator();
@@ -48,8 +43,7 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
     @Override
     public boolean advanceNextPosition() {
         if (table == TezosTable.BLOCK && !blockIter.hasNext()
-                || table == TezosTable.TRANSACTION && !txIter.hasNext()
-                || table == TezosTable.ERC20 && !logIter.hasNext()) {
+                || table == TezosTable.TRANSACTION && !txIter.hasNext()) {
             return false;
         }
 
@@ -96,45 +90,6 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             builder.add(tx::getGas);
             builder.add(tx::getGasPrice);
             builder.add(tx::getInput);
-        } else if (table == TezosTable.ERC20) {
-            while (logIter.hasNext()) {
-                Log l = logIter.next();
-                List<String> topics = l.getTopics();
-                String data = l.getData();
-
-                if (topics.get(0).equalsIgnoreCase(TezosERC20Utils.TRANSFER_EVENT_TOPIC)) {
-                    // Handle unindexed event fields:
-                    // if the number of topics and fields in data part != 4, then it's a weird event
-                    if (topics.size() < 3 && topics.size() + (data.length() - 2) / 64 != 4) {
-                        continue;
-                    }
-
-                    if (topics.size() < 3) {
-                        Iterator<String> dataFields = Splitter.fixedLength(64).split(data.substring(2)).iterator();
-                        while (topics.size() < 3) {
-                            topics.add("0x" + dataFields.next());
-                        }
-                        data = "0x" + dataFields.next();
-                    }
-
-                    // Token contract address
-                    builder.add(() -> Optional.ofNullable(TezosERC20Token.lookup.get(l.getAddress().toLowerCase()))
-                            .map(Enum::name).orElse(String.format("ERC20(%s)", l.getAddress())));
-                    // from address
-                    builder.add(() -> h32ToH20(topics.get(1)));
-                    // to address
-                    builder.add(() -> h32ToH20(topics.get(2)));
-                    // amount value
-                    String finalData = data;
-                    builder.add(() -> TezosERC20Utils.hexToDouble(finalData));
-                    builder.add(l::getTransactionHash);
-                    builder.add(l::getBlockNumber);
-                    this.suppliers = builder.build();
-                    return true;
-                }
-            }
-
-            return false;
         } else {
             return false;
         }
@@ -144,6 +99,7 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
     }
 
     private static String h32ToH20(String h32) {
-        return "0x" + h32.substring(TezosMetadata.H32_BYTE_HASH_STRING_LENGTH - TezosMetadata.H20_BYTE_HASH_STRING_LENGTH + 2);
+        return "0x" + h32
+                .substring(TezosMetadata.H32_BYTE_HASH_STRING_LENGTH - TezosMetadata.H20_BYTE_HASH_STRING_LENGTH + 2);
     }
 }

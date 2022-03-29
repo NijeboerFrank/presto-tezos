@@ -6,8 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TezosTable {
     BLOCK("block"),
-    TRANSACTION("transaction"),
-    ERC20("erc20");
+    TRANSACTION("transaction");
 
     @Getter
     private final String name;
