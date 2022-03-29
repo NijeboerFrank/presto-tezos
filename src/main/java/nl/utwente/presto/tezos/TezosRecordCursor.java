@@ -54,12 +54,6 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             //builder.add(blockBlock::getExtraData); //TODO add all the new Tezos fields that we want to use
             builder.add(blockBlock::getGasLimit);
             builder.add(blockBlock::getGasUsed);
-//            builder.add(() -> {
-//                return blockBlock.getTransactions()
-//                        .stream()
-//                        .map(tr -> ((EthBlock.TransactionObject) tr.get()).getHash())
-//                        .collect(Collectors.toList());
-//            });
         } else {
             return false;
         }
