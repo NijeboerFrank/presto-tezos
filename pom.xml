@@ -14,7 +14,7 @@
         <version.web3j>5.0.0</version.web3j>
         <version.guice>4.0</version.guice>
         <version.airlift>0.148</version.airlift>
-        <version.lombok>1.16.18</version.lombok>
+        <version.lombok>1.18.16</version.lombok>
         <version.javax>1.3.2</version.javax>
     </properties>
 
