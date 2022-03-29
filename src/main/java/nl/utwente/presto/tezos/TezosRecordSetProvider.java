@@ -8,6 +8,8 @@ import com.facebook.presto.spi.connector.ConnectorRecordSetProvider;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.handle.TezosHandleResolver;
+import nl.utwente.presto.tezos.tezos.TezosClient;
+import nl.utwente.presto.tezos.tezos.TezosProvider;
 import org.web3j.protocol.Web3j;
 
 import javax.inject.Inject;
@@ -17,11 +19,11 @@ import java.util.stream.Collectors;
 import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertSplit;
 
 public class TezosRecordSetProvider implements ConnectorRecordSetProvider {
-    private final Web3j web3j;
+    private final TezosClient tezosClient;
 
     @Inject
-    public TezosRecordSetProvider(TezosWeb3jProvider web3jProvider) {
-        this.web3j = web3jProvider.getWeb3j();
+    public TezosRecordSetProvider(TezosProvider tezosProvider) {
+        this.tezosClient = tezosProvider.getTezosClient();
     }
 
     @Override
@@ -37,6 +39,6 @@ public class TezosRecordSetProvider implements ConnectorRecordSetProvider {
                 .map(TezosHandleResolver::convertColumnHandle)
                 .collect(Collectors.toList());
 
-        return new TezosRecordSet(web3j, columnHandles, tezosSplit);
+        return new TezosRecordSet(tezosClient, columnHandles, tezosSplit);
     }
 }

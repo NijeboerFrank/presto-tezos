@@ -10,6 +10,8 @@ import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.handle.TezosTableHandle;
 import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
 import io.airlift.slice.Slice;
+import nl.utwente.presto.tezos.tezos.TezosClient;
+import nl.utwente.presto.tezos.tezos.TezosProvider;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
 
@@ -30,13 +32,13 @@ public class TezosMetadata extends BaseTezosMetadata {
     public static final int H256_BYTE_HASH_STRING_LENGTH = 2 + 256 * 2;
     public static final int H20_BYTE_HASH_STRING_LENGTH = 2 + 20 * 2;
 
-    private final Web3j web3j;
+    private final TezosClient tezosClient;
 
     @Inject
     public TezosMetadata(
-            TezosWeb3jProvider provider
+            TezosProvider provider
     ) {
-        this.web3j = requireNonNull(provider, "provider is null").getWeb3j();
+        this.tezosClient = requireNonNull(provider, "provider is null").getTezosClient();
     }
 
     /**
@@ -82,7 +84,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                                 .filter(Range::isSingleValue).forEach(r -> {
                                     String blockHash = ((Slice) r.getSingleValue()).toStringUtf8();
                                     try {
-                                        long blockNumber = web3j.ethGetBlockByHash(blockHash, true).send().getBlock().getNumber().longValue();
+                                        long blockNumber = tezosClient.getBlock(blockHash).getNumber().longValue();
                                         builder.add(new TezosBlockRange(blockNumber, blockNumber));
                                     } catch (IOException e) {
                                         throw new IllegalStateException("Unable to getting block by hash " + blockHash);
@@ -169,7 +171,12 @@ public class TezosMetadata extends BaseTezosMetadata {
      */
     private long findBlockByTimestamp(long timestamp, long offset) throws IOException {
         long startBlock = 1L;
-        long currentBlock = web3j.ethBlockNumber().send().getBlockNumber().longValue();
+        long currentBlock = 0;
+        try {
+            currentBlock = tezosClient.getLastBlockNumber();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (currentBlock <= 1) {
             return currentBlock;
@@ -181,7 +188,7 @@ public class TezosMetadata extends BaseTezosMetadata {
 
         while(low <= high) {
             middle = low + (high - low) / 2;
-            long ts = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(middle)), false).send().getBlock().getTimestamp().longValue();
+            long ts = tezosClient.getBlock(middle).getTimestamp().longValue();
 
             if (ts < timestamp) {
                 low = middle + 1;

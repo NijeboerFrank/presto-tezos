@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.web3j.protocol.core.methods.response.EthBlock;
 
 @Getter
 @Setter
@@ -89,4 +90,21 @@ public class Block {
     private long nOpsImplicit;
     private boolean lbEscVote;
     private long lbEscEma;
+
+    public Block getBlock() {
+        return this;
+    }
+
+    public Number getSize() { // TODO check if this is what they want from getSize
+        return this.storageSize;
+    }
+
+    public Number getNumber() {
+        return this.height;
+    }
+
+    public Number getTimestamp() {
+        //return this.time;
+        return 1; //TODO make time to number example time = "2022-03-29T09:12:24Z"
+    }
 }

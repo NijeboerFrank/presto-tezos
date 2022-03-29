@@ -6,6 +6,8 @@ import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
 import nl.utwente.presto.tezos.connector.TezosConnectorConfig;
 import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
 import io.airlift.log.Logger;
+import nl.utwente.presto.tezos.tezos.TezosClient;
+import nl.utwente.presto.tezos.tezos.TezosProvider;
 import org.web3j.protocol.Web3j;
 
 import javax.inject.Inject;
@@ -20,16 +22,16 @@ import static java.util.Objects.requireNonNull;
 public class TezosSplitManager implements ConnectorSplitManager {
     private static final Logger log = Logger.get(TezosSplitManager.class);
 
-    private final Web3j web3j;
+    private final TezosClient tezosClient;
 
     @Inject
     public TezosSplitManager(
             TezosConnectorConfig config,
-            TezosWeb3jProvider web3jProvider
+            TezosProvider tezosProvider
     ) {
-        requireNonNull(web3jProvider, "web3j is null");
+        requireNonNull(tezosProvider, "web3j is null");
         requireNonNull(config, "config is null");
-        this.web3j = web3jProvider.getWeb3j();
+        this.tezosClient = tezosProvider.getTezosClient();
     }
 
     /**
@@ -51,7 +53,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
         TezosTable table = TezosTable.valueOf(tableLayoutHandle.getTable().getTableName().toUpperCase());
 
         try {
-            long lastBlockNumber = web3j.ethBlockNumber().send().getBlockNumber().longValue();
+            long lastBlockNumber = tezosClient.getLastBlockNumber();
             log.info("current block number: " + lastBlockNumber);
 
             List<ConnectorSplit> connectorSplits;
@@ -74,7 +76,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
 
             log.info("Built %d splits", connectorSplits.size());
             return new FixedSplitSource(connectorSplits);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Cannot get block number: ", e);
         }

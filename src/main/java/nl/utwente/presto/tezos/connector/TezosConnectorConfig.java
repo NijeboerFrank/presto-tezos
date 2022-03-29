@@ -7,6 +7,7 @@ public class TezosConnectorConfig {
     private String tezosJsonRpc;
     private String tezosIpc;
     private String infuraRpc;
+    private String endpoint;
 
     @Config("tezos.jsonrpc")
     public TezosConnectorConfig setTezosJsonRpc(String tezosJsonRpc) {
@@ -17,6 +18,14 @@ public class TezosConnectorConfig {
     public String getTezosJsonRpc() {
         return tezosJsonRpc;
     }
+
+    @Config("tezos.endpoint")
+    public TezosConnectorConfig setTezosEndpoint(String tezosEndpoint) {
+        this.endpoint = tezosEndpoint;
+        return this;
+    }
+
+    public String getTezosEnpoint() {return endpoint;}
 
     @Config("tezos.ipc")
     public TezosConnectorConfig setTezosIpc(String tezosIpc) {

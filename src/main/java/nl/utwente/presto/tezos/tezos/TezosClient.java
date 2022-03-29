@@ -2,6 +2,7 @@ package nl.utwente.presto.tezos.tezos;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import org.web3j.protocol.Web3jService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,5 +47,9 @@ public class TezosClient {
                 new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8))
                 .lines()
                 .collect(Collectors.joining("\n"));
+    }
+
+    public long getLastBlockNumber() throws Exception {
+        return 0;
     }
 }
