@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Transaction {
+public class Block {
     private String hash;
     private String predecessor;
     private String successor;
