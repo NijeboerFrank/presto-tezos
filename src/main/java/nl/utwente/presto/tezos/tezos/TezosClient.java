@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
@@ -19,20 +18,20 @@ public class TezosClient {
         this.endpoint = endpoint;
     }
 
-    public Transaction getHeadTransaction() throws IOException {
-        return getTransaction("head");
+    public Block getHeadBlock() throws IOException {
+        return getBlock("head");
     }
 
-    public Transaction getTransaction(long height) throws IOException {
-        return getTransaction(String.valueOf(height));
+    public Block getBlock(long height) throws IOException {
+        return getBlock(String.valueOf(height));
     }
 
-    public Transaction getTransaction(String hash) throws IOException {
+    public Block getBlock(String hash) throws IOException {
         try {
             String json = doGetRequest(endpoint+"/explorer/block/"+hash);
             return new ObjectMapper()
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .readValue(json,  Transaction.class);
+                    .readValue(json,  Block.class);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get block "+hash);
