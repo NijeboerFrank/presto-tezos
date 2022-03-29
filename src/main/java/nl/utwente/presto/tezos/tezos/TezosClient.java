@@ -1,8 +1,16 @@
 package nl.utwente.presto.tezos.tezos;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 public class TezosClient {
     private final String endpoint;
@@ -21,7 +29,17 @@ public class TezosClient {
 
     public Transaction getTransaction(String hash) throws IOException {
         try {
-            return new ObjectMapper().readValue(endpoint+"/explorer/blocks/"+hash,  Transaction.class);
+            URL url = new URL(endpoint+"/explorer/block/"+hash);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setDoOutput(true);
+            String json = new BufferedReader(
+                    new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+            return new ObjectMapper()
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .readValue(json,  Transaction.class);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get block "+hash);

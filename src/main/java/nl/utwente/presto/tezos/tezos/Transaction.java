@@ -1,10 +1,13 @@
 package nl.utwente.presto.tezos.tezos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Transaction {
     private String hash;
     private String predecessor;
@@ -12,6 +15,7 @@ public class Transaction {
     private String baker;
     private long height;
     private long cycle;
+    @JsonProperty("is_cycle_snapshot")
     private boolean isCycleSnapshot;
     private String time;
     private long solvetime;
@@ -22,22 +26,39 @@ public class Transaction {
     private String nonce;
     private String votingPeriodKind;
     private String slotMask;
+    @JsonProperty("n_endorsed_slots")
     private long nEndorsedSlots;
+    @JsonProperty("n_ops")
     private long nOps;
+    @JsonProperty("n_ops_failed")
     private long nOpsFailed;
+    @JsonProperty("n_ops_contract")
     private long nOpsContract;
+    @JsonProperty("n_contract_calls")
     private long nContractCalls;
+    @JsonProperty("n_tx")
     private long nTx;
+    @JsonProperty("n_activation")
     private long nActivation;
+    @JsonProperty("n_seed_nonce_revelations")
     private long nSeedNonceRevelations;
+    @JsonProperty("n_double_baking_evidences")
     private long nDoubleBakingEvidences;
+    @JsonProperty("n_double_endorsement_evidences")
     private long nDoubleEndorsementEvidences;
+    @JsonProperty("n_endorsement")
     private long nEndorsement;
+    @JsonProperty("n_delegation")
     private long nDelegation;
+    @JsonProperty("n_reveal")
     private long nReveal;
+    @JsonProperty("n_origination")
     private long nOrigination;
+    @JsonProperty("n_proposal")
     private long nProposal;
+    @JsonProperty("n_ballot")
     private long nBallot;
+    @JsonProperty("n_register_constant")
     private long nRegisterConstant;
     private double volume;
     private double fee;
@@ -48,10 +69,15 @@ public class Transaction {
     private double unfrozenDeposits;
     private double activatedSupply;
     private double burnedSupply;
+    @JsonProperty("n_accounts")
     private long nAccounts;
+    @JsonProperty("n_new_accounts")
     private long nNewAccounts;
+    @JsonProperty("n_new_contracts")
     private long nNewContracts;
+    @JsonProperty("n_cleared_accounts")
     private long nClearedAccounts;
+    @JsonProperty("n_funded_accounts")
     private long nFundedAccounts;
     private long gasLimit;
     private long gasUsed;
@@ -59,6 +85,7 @@ public class Transaction {
     private long storageSize;
     private double daysDestroyed;
     private double pctAccountReuse;
+    @JsonProperty("n_ops_implicit")
     private long nOpsImplicit;
     private boolean lbEscVote;
     private long lbEscEma;
