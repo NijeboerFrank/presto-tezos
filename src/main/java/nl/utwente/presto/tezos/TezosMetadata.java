@@ -34,16 +34,16 @@ public class TezosMetadata extends BaseTezosMetadata {
 
     @Inject
     public TezosMetadata(
-            TezosWeb3jProvider provider
-    ) {
+            TezosWeb3jProvider provider) {
         this.web3j = requireNonNull(provider, "provider is null").getWeb3j();
     }
 
     /**
      * Get block ranges to search in based on query
+     * 
      * @param session
-     * @param table queried table
-     * @param constraint query constraints
+     * @param table          queried table
+     * @param constraint     query constraints
      * @param desiredColumns
      * @return
      */
@@ -52,15 +52,15 @@ public class TezosMetadata extends BaseTezosMetadata {
             ConnectorSession session,
             ConnectorTableHandle table,
             Constraint<ColumnHandle> constraint,
-            Optional<Set<ColumnHandle>> desiredColumns
-    ) {
+            Optional<Set<ColumnHandle>> desiredColumns) {
         ImmutableList.Builder<TezosBlockRange> builder = ImmutableList.builder();
 
         Optional<Map<ColumnHandle, Domain>> domains = constraint.getSummary().getDomains();
         if (domains.isPresent()) {
             Map<ColumnHandle, Domain> columnHandleDomainMap = domains.get();
             for (Map.Entry<ColumnHandle, Domain> entry : columnHandleDomainMap.entrySet()) {
-                if (!(entry.getKey() instanceof TezosColumnHandle)) continue;
+                if (!(entry.getKey() instanceof TezosColumnHandle))
+                    continue;
 
                 String columnName = ((TezosColumnHandle) entry.getKey()).getName();
                 List<Range> orderedRanges = entry.getValue().getValues().getRanges().getOrderedRanges();
@@ -82,7 +82,8 @@ public class TezosMetadata extends BaseTezosMetadata {
                                 .filter(Range::isSingleValue).forEach(r -> {
                                     String blockHash = ((Slice) r.getSingleValue()).toStringUtf8();
                                     try {
-                                        long blockNumber = web3j.ethGetBlockByHash(blockHash, true).send().getBlock().getNumber().longValue();
+                                        long blockNumber = web3j.ethGetBlockByHash(blockHash, true).send().getBlock()
+                                                .getNumber().longValue();
                                         builder.add(new TezosBlockRange(blockNumber, blockNumber));
                                     } catch (IOException e) {
                                         throw new IllegalStateException("Unable to getting block by hash " + blockHash);
@@ -96,8 +97,10 @@ public class TezosMetadata extends BaseTezosMetadata {
                             Marker low = r.getLow();
                             Marker high = r.getHigh();
                             try {
-                                long startBlock = low.isLowerUnbounded() ? 1L : findBlockByTimestamp((Long) low.getValue(), -1L);
-                                long endBlock = high.isUpperUnbounded() ? -1L : findBlockByTimestamp((Long) high.getValue(), 1L);
+                                long startBlock = low.isLowerUnbounded() ? 1L
+                                        : findBlockByTimestamp((Long) low.getValue(), -1L);
+                                long endBlock = high.isUpperUnbounded() ? -1L
+                                        : findBlockByTimestamp((Long) high.getValue(), 1L);
                                 builder.add(new TezosBlockRange(startBlock, endBlock));
                             } catch (IOException e) {
                                 throw new IllegalStateException("Unable to find block by timestamp");
@@ -116,11 +119,12 @@ public class TezosMetadata extends BaseTezosMetadata {
 
     /**
      * Return the columns and their types
+     * 
      * @param table table to get columns of
      * @return list of columns
      */
     @Override
-    protected  List<Pair<String, Type>> getColumnsWithTypes(String table) {
+    protected List<Pair<String, Type>> getColumnsWithTypes(String table) {
         ImmutableList.Builder<Pair<String, Type>> builder = ImmutableList.builder();
 
         if (TezosTable.BLOCK.getName().equals(table)) {
@@ -130,7 +134,8 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_nonce", VarcharType.createVarcharType(H8_BYTE_HASH_STRING_LENGTH)));
             builder.add(new Pair<>("block_sha3Uncles", VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH)));
             builder.add(new Pair<>("block_logsBloom", VarcharType.createVarcharType(H256_BYTE_HASH_STRING_LENGTH)));
-            builder.add(new Pair<>("block_transactionsRoot", VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH)));
+            builder.add(
+                    new Pair<>("block_transactionsRoot", VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH)));
             builder.add(new Pair<>("block_stateRoot", VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH)));
             builder.add(new Pair<>("block_miner", VarcharType.createVarcharType(H20_BYTE_HASH_STRING_LENGTH)));
             builder.add(new Pair<>("block_difficulty", BigintType.BIGINT));
@@ -140,20 +145,8 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_gasLimit", DoubleType.DOUBLE));
             builder.add(new Pair<>("block_gasUsed", DoubleType.DOUBLE));
             builder.add(new Pair<>("block_timestamp", BigintType.BIGINT));
-            builder.add(new Pair<>("block_transactions", new ArrayType(VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH))));
-            builder.add(new Pair<>("block_uncles", new ArrayType(VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH))));
-        } else if (TezosTable.TRANSACTION.getName().equals(table)) {
-            builder.add(new Pair<>("tx_hash", VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH)));
-            builder.add(new Pair<>("tx_nonce", BigintType.BIGINT));
-            builder.add(new Pair<>("tx_blockHash", VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH)));
-            builder.add(new Pair<>("tx_blockNumber", BigintType.BIGINT));
-            builder.add(new Pair<>("tx_transactionIndex", IntegerType.INTEGER));
-            builder.add(new Pair<>("tx_from", VarcharType.createVarcharType(H20_BYTE_HASH_STRING_LENGTH)));
-            builder.add(new Pair<>("tx_to", VarcharType.createVarcharType(H20_BYTE_HASH_STRING_LENGTH)));
-            builder.add(new Pair<>("tx_value", DoubleType.DOUBLE));
-            builder.add(new Pair<>("tx_gas", DoubleType.DOUBLE));
-            builder.add(new Pair<>("tx_gasPrice", DoubleType.DOUBLE));
-            builder.add(new Pair<>("tx_input", VarcharType.VARCHAR));
+            builder.add(new Pair<>("block_uncles",
+                    new ArrayType(VarcharType.createVarcharType(H32_BYTE_HASH_STRING_LENGTH))));
         } else {
             throw new IllegalArgumentException("Unknown Table Name " + table);
         }
@@ -163,8 +156,9 @@ public class TezosMetadata extends BaseTezosMetadata {
 
     /**
      * Get the ID of a block that was added at a given timestamp
+     * 
      * @param timestamp timestamp of block
-     * @param offset offset to middle block
+     * @param offset    offset to middle block
      * @return ID of block
      */
     private long findBlockByTimestamp(long timestamp, long offset) throws IOException {
@@ -179,9 +173,10 @@ public class TezosMetadata extends BaseTezosMetadata {
         long high = currentBlock;
         long middle = low + (high - low) / 2;
 
-        while(low <= high) {
+        while (low <= high) {
             middle = low + (high - low) / 2;
-            long ts = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(middle)), false).send().getBlock().getTimestamp().longValue();
+            long ts = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(middle)), false).send()
+                    .getBlock().getTimestamp().longValue();
 
             if (ts < timestamp) {
                 low = middle + 1;

@@ -89,7 +89,8 @@ public abstract class BaseTezosRecordCursor implements RecordCursor {
 
     @Override
     public Object getObject(int field) {
-        return serializeObject(columnHandles.get(field).getType(), null, suppliers.get(fieldToColumnIndex[field]).get());
+        return serializeObject(columnHandles.get(field).getType(), null,
+                suppliers.get(fieldToColumnIndex[field]).get());
     }
 
     @Override
@@ -109,8 +110,6 @@ public abstract class BaseTezosRecordCursor implements RecordCursor {
             return serializeList(type, builder, object);
         } else if (isMapType(type)) {
             return serializeMap(type, builder, object);
-        } else if (isRowType(type)) {
-            return serializeStruct(type, builder, object);
         }
         throw new RuntimeException("Unknown object type: " + type);
     }
@@ -130,7 +129,8 @@ public abstract class BaseTezosRecordCursor implements RecordCursor {
         if (builder != null) {
             currentBuilder = builder.beginBlockEntry();
         } else {
-            currentBuilder = elementType.createBlockBuilder(new PageBuilderStatus().createBlockBuilderStatus(), list.size());
+            currentBuilder = elementType.createBlockBuilder(new PageBuilderStatus().createBlockBuilderStatus(),
+                    list.size());
         }
 
         for (Object element : list) {
@@ -181,47 +181,6 @@ public abstract class BaseTezosRecordCursor implements RecordCursor {
         }
     }
 
-    private static Block serializeStruct(Type type, BlockBuilder builder, Object object) {
-        if (object == null) {
-            requireNonNull(builder, "parent builder is null").appendNull();
-            return null;
-        }
-
-        List<Type> typeParameters = type.getTypeParameters();
-        EthBlock.TransactionObject structData = (EthBlock.TransactionObject) object;
-        boolean builderSynthesized = false;
-        if (builder == null) {
-            builderSynthesized = true;
-            builder = type.createBlockBuilder(new PageBuilderStatus().createBlockBuilderStatus(), 1);
-        }
-        BlockBuilder currentBuilder = builder.beginBlockEntry();
-
-        ImmutableList.Builder<Supplier> lstBuilder = ImmutableList.builder();
-        lstBuilder.add(structData::getHash);
-        lstBuilder.add(structData::getNonce);
-        lstBuilder.add(structData::getBlockHash);
-        lstBuilder.add(structData::getBlockNumber);
-        lstBuilder.add(structData::getTransactionIndex);
-        lstBuilder.add(structData::getFrom);
-        lstBuilder.add(structData::getTo);
-        lstBuilder.add(structData::getValue);
-        lstBuilder.add(structData::getGas);
-        lstBuilder.add(structData::getGasPrice);
-        lstBuilder.add(structData::getInput);
-        ImmutableList<Supplier> txColumns = lstBuilder.build();
-
-        for (int i = 0; i < typeParameters.size(); i++) {
-            serializeObject(typeParameters.get(i), currentBuilder, txColumns.get(i).get());
-        }
-
-        builder.closeEntry();
-        if (builderSynthesized) {
-            return (Block) type.getObject(builder, 0);
-        } else {
-            return null;
-        }
-    }
-
     private static void serializePrimitive(Type type, BlockBuilder builder, Object object) {
         requireNonNull(builder, "parent builder is null");
 
@@ -258,7 +217,8 @@ public abstract class BaseTezosRecordCursor implements RecordCursor {
 
     public static boolean isStructuralType(Type type) {
         String baseName = type.getTypeSignature().getBase();
-        return baseName.equals(StandardTypes.MAP) || baseName.equals(StandardTypes.ARRAY) || baseName.equals(StandardTypes.ROW);
+        return baseName.equals(StandardTypes.MAP) || baseName.equals(StandardTypes.ARRAY)
+                || baseName.equals(StandardTypes.ROW);
     }
 
     private static Slice getSliceExpressedValue(Object value, Type type) {
