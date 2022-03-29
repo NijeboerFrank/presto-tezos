@@ -19,8 +19,6 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
     private final EthBlock block;
     private final Iterator<EthBlock> blockIter;
-    private final Iterator<EthBlock.TransactionResult> txIter;
-    private final Iterator<Log> logIter;
 
     private final TezosTable table;
 
@@ -31,8 +29,6 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
         this.block = requireNonNull(block, "block is null");
         this.blockIter = ImmutableList.of(block).iterator();
-        this.txIter = block.getBlock().getTransactions().iterator();
-        this.logIter = new TezosLogLazyIterator(block, web3j);
     }
 
     @Override
@@ -42,8 +38,7 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
     @Override
     public boolean advanceNextPosition() {
-        if (table == TezosTable.BLOCK && !blockIter.hasNext()
-                || table == TezosTable.TRANSACTION && !txIter.hasNext()) {
+        if (table == TezosTable.BLOCK && !blockIter.hasNext()) {
             return false;
         }
 
@@ -67,29 +62,8 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             builder.add(blockBlock::getGasLimit);
             builder.add(blockBlock::getGasUsed);
             builder.add(blockBlock::getTimestamp);
-            builder.add(() -> {
-                return blockBlock.getTransactions()
-                        .stream()
-                        .map(tr -> ((EthBlock.TransactionObject) tr.get()).getHash())
-                        .collect(Collectors.toList());
-            });
             builder.add(blockBlock::getUncles);
 
-        } else if (table == TezosTable.TRANSACTION) {
-            EthBlock.TransactionResult tr = txIter.next();
-            EthBlock.TransactionObject tx = (EthBlock.TransactionObject) tr.get();
-
-            builder.add(tx::getHash);
-            builder.add(tx::getNonce);
-            builder.add(tx::getBlockHash);
-            builder.add(tx::getBlockNumber);
-            builder.add(tx::getTransactionIndex);
-            builder.add(tx::getFrom);
-            builder.add(tx::getTo);
-            builder.add(tx::getValue);
-            builder.add(tx::getGas);
-            builder.add(tx::getGasPrice);
-            builder.add(tx::getInput);
         } else {
             return false;
         }

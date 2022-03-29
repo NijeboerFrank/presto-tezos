@@ -7,10 +7,6 @@ import com.facebook.presto.spi.ConnectorTableHandle;
 import com.facebook.presto.spi.ConnectorTableLayoutHandle;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
 import nl.utwente.presto.tezos.TezosSplit;
-import nl.utwente.presto.tezos.handle.TezosColumnHandle;
-import nl.utwente.presto.tezos.handle.TezosTableHandle;
-import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
-import nl.utwente.presto.tezos.handle.TezosTransactionHandle;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -49,7 +45,8 @@ public class TezosHandleResolver implements ConnectorHandleResolver {
 
     public static TezosColumnHandle convertColumnHandle(ColumnHandle columnHandle) {
         requireNonNull(columnHandle, "columnHandle is null");
-        checkArgument(columnHandle instanceof TezosColumnHandle, "columnHandle is not an instance of TezosColumnHandle");
+        checkArgument(columnHandle instanceof TezosColumnHandle,
+                "columnHandle is not an instance of TezosColumnHandle");
         return (TezosColumnHandle) columnHandle;
     }
 
