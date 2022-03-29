@@ -29,14 +29,7 @@ public class TezosClient {
 
     public Transaction getTransaction(String hash) throws IOException {
         try {
-            URL url = new URL(endpoint+"/explorer/block/"+hash);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoOutput(true);
-            String json = new BufferedReader(
-                    new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8))
-                    .lines()
-                    .collect(Collectors.joining("\n"));
+            String json = doGetRequest(endpoint+"/explorer/block/"+hash);
             return new ObjectMapper()
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .readValue(json,  Transaction.class);
@@ -44,5 +37,15 @@ public class TezosClient {
             e.printStackTrace();
             throw new IOException("Failed to get block "+hash);
         }
+    }
+
+    private String doGetRequest(String url) throws Exception {
+        HttpURLConnection urlConnection = (HttpURLConnection) (new URL(url)).openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.setDoOutput(true);
+        return new BufferedReader(
+                new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8))
+                .lines()
+                .collect(Collectors.joining("\n"));
     }
 }
