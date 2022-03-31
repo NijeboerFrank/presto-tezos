@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableSet;
 import nl.utwente.presto.tezos.connector.TezosConnectorFactory;
 import nl.utwente.presto.tezos.udfs.TezosUDFs;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class TezosPlugin implements Plugin {
@@ -17,6 +18,6 @@ public class TezosPlugin implements Plugin {
 
     @Override
     public Set<Class<?>> getFunctions() {
-        return ImmutableSet.of(TezosUDFs.class);
+        return Collections.emptySet(); // TODO ImmutableSet.of(TezosUDFs.class);
     }
 }
