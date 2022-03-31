@@ -26,6 +26,10 @@ public class TezosClient {
         return getBlock("head");
     }
 
+    public long getLastBlockNumber() throws Exception {
+        return getHeadBlock().getHeight();
+    }
+
     public Block getBlock(long height) throws IOException {
         return getBlock(String.valueOf(height));
     }
@@ -88,9 +92,5 @@ public class TezosClient {
                 new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8))
                 .lines()
                 .collect(Collectors.joining("\n"));
-    }
-
-    public long getLastBlockNumber() throws Exception {
-        return 0;
     }
 }

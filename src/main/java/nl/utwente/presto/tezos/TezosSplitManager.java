@@ -7,11 +7,9 @@ import nl.utwente.presto.tezos.connector.TezosConnectorConfig;
 import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
 import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.tezos.TezosClient;
-import nl.utwente.presto.tezos.tezos.TezosProvider;
-import org.web3j.protocol.Web3j;
+import nl.utwente.presto.tezos.tezos.TezosClientProvider;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -27,11 +25,11 @@ public class TezosSplitManager implements ConnectorSplitManager {
     @Inject
     public TezosSplitManager(
             TezosConnectorConfig config,
-            TezosProvider tezosProvider
+            TezosClientProvider tezosClientProvider
     ) {
-        requireNonNull(tezosProvider, "web3j is null");
+        requireNonNull(tezosClientProvider, "tezos client provider is null");
         requireNonNull(config, "config is null");
-        this.tezosClient = tezosProvider.getTezosClient();
+        this.tezosClient = tezosClientProvider.getTezosClient();
     }
 
     /**

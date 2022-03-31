@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.web3j.protocol.core.methods.response.EthBlock;
+
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -101,7 +102,6 @@ public class Block {
     }
 
     public Number getTimestamp() {
-        //return this.time;
-        return 1; //TODO make time to number example time = "2022-03-29T09:12:24Z"
+        return Instant.parse(this.time).getEpochSecond();
     }
 }

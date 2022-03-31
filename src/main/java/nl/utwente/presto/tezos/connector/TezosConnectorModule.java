@@ -6,7 +6,7 @@ import com.google.inject.Scopes;
 import nl.utwente.presto.tezos.TezosMetadata;
 import nl.utwente.presto.tezos.TezosRecordSetProvider;
 import nl.utwente.presto.tezos.TezosSplitManager;
-import nl.utwente.presto.tezos.tezos.TezosProvider;
+import nl.utwente.presto.tezos.tezos.TezosClientProvider;
 
 import static io.airlift.configuration.ConfigBinder.configBinder;
 
@@ -18,7 +18,7 @@ public class TezosConnectorModule implements Module {
     public void configure(Binder binder) {
         binder.bind(TezosConnector.class).in(Scopes.SINGLETON);
         binder.bind(TezosMetadata.class).in(Scopes.SINGLETON);
-        binder.bind(TezosProvider.class).in(Scopes.SINGLETON);
+        binder.bind(TezosClientProvider.class).in(Scopes.SINGLETON);
 
         binder.bind(TezosSplitManager.class).in(Scopes.SINGLETON);
         binder.bind(TezosRecordSetProvider.class).in(Scopes.SINGLETON);

@@ -11,13 +11,10 @@ import nl.utwente.presto.tezos.handle.TezosTableHandle;
 import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
 import io.airlift.slice.Slice;
 import nl.utwente.presto.tezos.tezos.TezosClient;
-import nl.utwente.presto.tezos.tezos.TezosProvider;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
+import nl.utwente.presto.tezos.tezos.TezosClientProvider;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,7 +33,7 @@ public class TezosMetadata extends BaseTezosMetadata {
 
     @Inject
     public TezosMetadata(
-            TezosProvider provider
+            TezosClientProvider provider
     ) {
         this.tezosClient = requireNonNull(provider, "provider is null").getTezosClient();
     }
