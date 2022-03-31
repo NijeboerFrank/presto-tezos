@@ -1,22 +1,16 @@
 package nl.utwente.presto.tezos.udfs;
 
+import com.facebook.presto.common.type.StandardTypes;
 import com.facebook.presto.spi.function.Description;
 import com.facebook.presto.spi.function.ScalarFunction;
 import com.facebook.presto.spi.function.SqlType;
-import com.facebook.presto.common.type.StandardTypes;
-import nl.utwente.presto.tezos.connector.TezosConnectorConfig;
-import io.airlift.configuration.ConfigurationLoader;
 import io.airlift.log.Logger;
 import io.airlift.slice.Slice;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.protocol.infura.InfuraHttpService;
-import org.web3j.protocol.ipc.UnixIpcService;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Map;
 
 public class TezosUDFs {
     private static final Logger log = Logger.get(TezosUDFs.class);

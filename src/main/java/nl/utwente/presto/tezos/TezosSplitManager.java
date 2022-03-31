@@ -3,9 +3,9 @@ package nl.utwente.presto.tezos;
 import com.facebook.presto.spi.*;
 import com.facebook.presto.spi.connector.ConnectorSplitManager;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
+import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.connector.TezosConnectorConfig;
 import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
-import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.tezos.TezosClient;
 import nl.utwente.presto.tezos.tezos.TezosClientProvider;
 
@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertLayout;
 import static java.util.Objects.requireNonNull;
+import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertLayout;
 
 public class TezosSplitManager implements ConnectorSplitManager {
     private static final Logger log = Logger.get(TezosSplitManager.class);

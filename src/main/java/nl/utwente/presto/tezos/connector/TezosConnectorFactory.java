@@ -5,8 +5,8 @@ import com.facebook.presto.spi.connector.Connector;
 import com.facebook.presto.spi.connector.ConnectorContext;
 import com.facebook.presto.spi.connector.ConnectorFactory;
 import com.google.inject.Injector;
-import nl.utwente.presto.tezos.handle.TezosHandleResolver;
 import io.airlift.bootstrap.Bootstrap;
+import nl.utwente.presto.tezos.handle.TezosHandleResolver;
 
 import java.util.Map;
 

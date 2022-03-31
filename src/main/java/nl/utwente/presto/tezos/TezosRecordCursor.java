@@ -1,17 +1,14 @@
 package nl.utwente.presto.tezos;
 
 import com.google.common.collect.ImmutableList;
-import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import io.airlift.log.Logger;
+import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.tezos.Block;
 import nl.utwente.presto.tezos.tezos.TezosClient;
-import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.core.methods.response.Log;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 

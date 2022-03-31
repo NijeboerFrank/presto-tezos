@@ -6,10 +6,10 @@ import com.facebook.presto.common.predicate.Range;
 import com.facebook.presto.common.type.*;
 import com.facebook.presto.spi.*;
 import com.google.common.collect.ImmutableList;
+import io.airlift.slice.Slice;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.handle.TezosTableHandle;
 import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
-import io.airlift.slice.Slice;
 import nl.utwente.presto.tezos.tezos.TezosClient;
 import nl.utwente.presto.tezos.tezos.TezosClientProvider;
 
@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertTableHandle;
 import static java.util.Objects.requireNonNull;
+import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertTableHandle;
 
 public class TezosMetadata extends BaseTezosMetadata {
     public static final int H8_BYTE_HASH_STRING_LENGTH = 2 + 8 * 2;

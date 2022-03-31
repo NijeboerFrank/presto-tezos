@@ -1,17 +1,14 @@
 package nl.utwente.presto.tezos;
 
+import com.facebook.presto.common.type.Type;
 import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
-import com.facebook.presto.common.type.Type;
-import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import io.airlift.log.Logger;
-import nl.utwente.presto.tezos.tezos.TezosClient;
+import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.tezos.Block;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.EthBlock;
+import nl.utwente.presto.tezos.tezos.TezosClient;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
