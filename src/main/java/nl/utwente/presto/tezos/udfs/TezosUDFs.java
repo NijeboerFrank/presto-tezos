@@ -20,43 +20,9 @@ import java.util.Map;
 
 public class TezosUDFs {
     private static final Logger log = Logger.get(TezosUDFs.class);
-    private static final String CONFIG_PATH = "etc/catalog/tezos.properties";
-    private static final String JSONRPC_KEY = "tezos.jsonrpc";
-    private static final String IPC_KEY = "tezos.ipc";
-    private static final String INFURA_KEY = "tezos.infura";
     private static final String LATEST = "latest";
     private static final String ZERO_X = "0x";
-    private static final Web3j web3j;
-
-    // A hack, which I don't like
-    static {
-        log.info("Initializing Web3j in UDF...");
-        ConfigurationLoader configLoader = new ConfigurationLoader();
-        try {
-            Map<String, String> config = configLoader.loadPropertiesFrom(CONFIG_PATH);
-            if (config.get(JSONRPC_KEY) == null
-                    && config.get(IPC_KEY) == null
-                    && config.get(INFURA_KEY) == null) {
-                web3j = Web3j.build(new HttpService(TezosConnectorConfig.DEFAULT_JSON_RPC));
-            } else if (config.get(JSONRPC_KEY) != null
-                    && config.get(IPC_KEY) == null
-                    && config.get(INFURA_KEY) == null) {
-                web3j = Web3j.build(new HttpService(config.get(JSONRPC_KEY)));
-            } else if (config.get(JSONRPC_KEY) == null
-                    && config.get(IPC_KEY) != null
-                    && config.get(INFURA_KEY) == null) {
-                web3j = Web3j.build(new UnixIpcService(config.get(IPC_KEY)));
-            } else if (config.get(JSONRPC_KEY) == null
-                    && config.get(IPC_KEY) == null
-                    && config.get(INFURA_KEY) != null) {
-                web3j = Web3j.build(new InfuraHttpService(config.get(INFURA_KEY)));
-            } else {
-                throw new IllegalArgumentException("More than 1 Tezos service providers found");
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot load config from " + CONFIG_PATH);
-        }
-    }
+    private static final Web3j web3j = null; // TODO Implement functions using TezosClient
 
     @ScalarFunction("eth_gasPrice")
     @Description("Returns current gas price")
