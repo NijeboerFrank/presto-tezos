@@ -106,4 +106,8 @@ public class Block {
     public Number getTimestamp() {
         return Instant.parse(this.time).getEpochSecond();
     }
+
+    public Number getTimestampMillis() {
+        return Instant.parse(this.time).getEpochSecond() * 1000;
+    }
 }

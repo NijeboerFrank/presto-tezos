@@ -50,7 +50,7 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             builder.add(block::getHeight);
             builder.add(block::getCycle);
             builder.add(block::isCycleSnapshot);
-            builder.add(block::getTime);
+            builder.add(block::getTimestampMillis);
             builder.add(block::getSolvetime);
             builder.add(block::getVersion);
             builder.add(block::getFitness);

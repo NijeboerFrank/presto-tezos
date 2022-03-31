@@ -132,7 +132,7 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_height", BigintType.BIGINT));
             builder.add(new Pair<>("block_cycle", BigintType.BIGINT));
             builder.add(new Pair<>("block_isCycleSnapshot", BooleanType.BOOLEAN));
-            builder.add(new Pair<>("block_time", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("block_time", TimestampType.TIMESTAMP));
             builder.add(new Pair<>("block_solvetime", BigintType.BIGINT));
             builder.add(new Pair<>("block_version", BigintType.BIGINT));
             builder.add(new Pair<>("block_fitness", BigintType.BIGINT));
