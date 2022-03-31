@@ -1,15 +1,11 @@
-# Presto Tezos Connector
-Unleash the Power of Presto Interactive SQL Querying on Tezos Blockchain
+# Presto Tezos Connector (Work in Progress )
+Unleash the Power of Presto Interactive SQL Querying on Tezos Blockchain. 
+This plugin is based on the [Presto Ethereum Plugin](https://github.com/xiaoyao1991/presto-ethereum).
 
 ### Introduction
 [Presto](https://prestosql.io) is a powerful interactive querying engine that enables running SQL queries on anything -- be it MySQL, HDFS, local file, Kafka -- as long as there exist a connector to the source.
 
-This is a Presto connector to the Tezos blockchain data. With this connector, one can get hands on with Tezos blockchain analytics work without having to know how to play with the nitty gritty Javascript API.
-
-### Prerequisites
-Have an Tezos client that you can connect to. There are 2 options:
-1. Run [Geth](https://github.com/tezos/go-tezos) or [Parity](https://github.com/paritytech/parity) locally.
-1. Use [Infura](https://infura.io), a hosted Tezos client in the cloud.    
+This is a Presto connector to the Tezos blockchain. With this connector, you can explore the Tezos blockchain from the comforts of SQL.
 
 ### Note
 Specify a block range where you can (e.g. `WHERE block.block_number > x AND block.block_number < y`, or `WHERE transaction.tx_blocknumber > x AND transaction.tx_blocknumber < y`, or `WHERE erc20.erc20_blocknumber > x AND erc20.erc20_blocknumber < y`). Block number is the default and only predicate that can push down to narrow down data scan range. Queries without block ranges will cause presto to retrieve blocks all the way from the first block, which takes forever. 

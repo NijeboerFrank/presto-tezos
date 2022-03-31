@@ -20,7 +20,6 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
     private final Block block;
     private final Iterator<Block> blockIter;
-    private final Iterator<Log> logIter;
 
     private final TezosTable table;
 
@@ -31,7 +30,6 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
         this.block = requireNonNull(block, "block is null");
         this.blockIter = ImmutableList.of(block).iterator();
-        this.logIter = new TezosLogLazyIterator(block, tezosClient);
     }
 
     @Override
@@ -41,7 +39,7 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
     @Override
     public boolean advanceNextPosition() {
-        if (table == TezosTable.BLOCK && !blockIter.hasNext() ){
+        if (table == TezosTable.BLOCK && !blockIter.hasNext()) {
             return false;
         }
 
@@ -54,6 +52,8 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             //builder.add(blockBlock::getExtraData); //TODO add all the new Tezos fields that we want to use
             builder.add(blockBlock::getGasLimit);
             builder.add(blockBlock::getGasUsed);
+            builder.add(blockBlock::getTimestamp);
+
         } else {
             return false;
         }

@@ -2,17 +2,18 @@ package nl.utwente.presto.tezos.tezos;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.web3j.protocol.core.methods.response.EthBlock;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Block {
     private String hash;
     private String predecessor;
-    private String successor;
     private String baker;
     private long height;
     private long cycle;
@@ -21,7 +22,6 @@ public class Block {
     private String time;
     private long solvetime;
     private long version;
-    private long validationPass;
     private long fitness;
     private long priority;
     private String nonce;
@@ -65,9 +65,6 @@ public class Block {
     private double fee;
     private double reward;
     private double deposit;
-    private double unfrozenFees;
-    private double unfrozenRewards;
-    private double unfrozenDeposits;
     private double activatedSupply;
     private double burnedSupply;
     @JsonProperty("n_accounts")

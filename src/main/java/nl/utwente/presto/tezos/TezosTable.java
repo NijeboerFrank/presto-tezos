@@ -5,8 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum TezosTable {
-    BLOCK("block"),
-    TRANSACTION("transaction");
+    BLOCK("block");
 
     @Getter
     private final String name;
