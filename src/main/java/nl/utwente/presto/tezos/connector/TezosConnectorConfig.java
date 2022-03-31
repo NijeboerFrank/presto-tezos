@@ -11,5 +11,7 @@ public class TezosConnectorConfig {
         return this;
     }
 
-    public String getTezosEnpoint() {return endpoint;}
+    public String getTezosEndpoint() {
+        return this.endpoint;
+    }
 }

@@ -8,7 +8,7 @@ public class TezosClientProvider {
 
     public TezosClientProvider(TezosConnectorConfig config) {
 
-        tezosClient = new TezosClient(config.getTezosEnpoint());
+        tezosClient = new TezosClient(config.getTezosEndpoint());
     }
 
     public TezosClient getTezosClient() {
