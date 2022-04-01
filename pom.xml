@@ -11,7 +11,6 @@
 
     <properties>
         <version.presto>0.271</version.presto>
-        <version.web3j>5.0.0</version.web3j>
         <version.guice>4.0</version.guice>
         <version.airlift>0.148</version.airlift>
         <version.lombok>1.18.16</version.lombok>
@@ -31,18 +30,6 @@
             <artifactId>presto-common</artifactId>
             <scope>provided</scope>
             <version>${version.presto}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.web3j</groupId>
-            <artifactId>core</artifactId>
-            <version>${version.web3j}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.web3j</groupId>
-            <artifactId>hosted-providers</artifactId>
-            <version>${version.web3j}</version>
         </dependency>
 
         <dependency>

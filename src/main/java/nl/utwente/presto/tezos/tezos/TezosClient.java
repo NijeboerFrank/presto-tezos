@@ -26,6 +26,10 @@ public class TezosClient {
         return getBlock("head");
     }
 
+    public long getLastBlockNumber() throws Exception {
+        return getHeadBlock().getHeight();
+    }
+
     public Block getBlock(long height) throws IOException {
         return getBlock(String.valueOf(height));
     }

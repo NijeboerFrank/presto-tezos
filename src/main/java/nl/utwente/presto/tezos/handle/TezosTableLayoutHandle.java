@@ -3,8 +3,8 @@ package nl.utwente.presto.tezos.handle;
 import com.facebook.presto.spi.ConnectorTableLayoutHandle;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import nl.utwente.presto.tezos.TezosBlockRange;
 import lombok.ToString;
+import nl.utwente.presto.tezos.TezosBlockRange;
 
 import java.util.List;
 

@@ -3,33 +3,33 @@ package nl.utwente.presto.tezos;
 import com.facebook.presto.spi.*;
 import com.facebook.presto.spi.connector.ConnectorSplitManager;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
+import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.connector.TezosConnectorConfig;
 import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
-import io.airlift.log.Logger;
-import org.web3j.protocol.Web3j;
+import nl.utwente.presto.tezos.tezos.TezosClient;
+import nl.utwente.presto.tezos.tezos.TezosClientProvider;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertLayout;
 import static java.util.Objects.requireNonNull;
+import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertLayout;
 
 public class TezosSplitManager implements ConnectorSplitManager {
     private static final Logger log = Logger.get(TezosSplitManager.class);
 
-    private final Web3j web3j;
+    private final TezosClient tezosClient;
 
     @Inject
     public TezosSplitManager(
             TezosConnectorConfig config,
-            TezosWeb3jProvider web3jProvider
+            TezosClientProvider tezosClientProvider
     ) {
-        requireNonNull(web3jProvider, "web3j is null");
+        requireNonNull(tezosClientProvider, "tezos client provider is null");
         requireNonNull(config, "config is null");
-        this.web3j = web3jProvider.getWeb3j();
+        this.tezosClient = tezosClientProvider.getTezosClient();
     }
 
     /**
@@ -51,7 +51,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
         TezosTable table = TezosTable.valueOf(tableLayoutHandle.getTable().getTableName().toUpperCase());
 
         try {
-            long lastBlockNumber = web3j.ethBlockNumber().send().getBlockNumber().longValue();
+            long lastBlockNumber = tezosClient.getLastBlockNumber();
             log.info("current block number: " + lastBlockNumber);
 
             List<ConnectorSplit> connectorSplits;
@@ -74,7 +74,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
 
             log.info("Built %d splits", connectorSplits.size());
             return new FixedSplitSource(connectorSplits);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Cannot get block number: ", e);
         }

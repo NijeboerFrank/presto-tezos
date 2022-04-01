@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.Instant;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Block {
@@ -86,4 +90,24 @@ public class Block {
     private long nOpsImplicit;
     private boolean lbEscVote;
     private long lbEscEma;
+
+    public Block getBlock() {
+        return this;
+    }
+
+    public Number getSize() { // TODO check if this is what they want from getSize
+        return this.storageSize;
+    }
+
+    public Number getNumber() {
+        return this.height;
+    }
+
+    public Number getTimestamp() {
+        return Instant.parse(this.time).getEpochSecond();
+    }
+
+    public Number getTimestampMillis() {
+        return Instant.parse(this.time).getEpochSecond() * 1000;
+    }
 }

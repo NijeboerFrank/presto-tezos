@@ -1,17 +1,14 @@
 package nl.utwente.presto.tezos;
 
+import com.facebook.presto.common.type.Type;
 import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
-import com.facebook.presto.common.type.Type;
-import com.google.common.collect.ImmutableList;
-import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import io.airlift.log.Logger;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.methods.response.EthBlock;
+import nl.utwente.presto.tezos.handle.TezosColumnHandle;
+import nl.utwente.presto.tezos.tezos.Block;
+import nl.utwente.presto.tezos.tezos.TezosClient;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,14 +18,14 @@ public class TezosRecordSet implements RecordSet {
     private static final Logger log = Logger.get(TezosRecordSet.class);
 
     private final TezosSplit split;
-    private final Web3j web3j;
+    private final TezosClient tezosClient;
 
     private final List<TezosColumnHandle> columnHandles;
     private final List<Type> columnTypes;
 
-    TezosRecordSet(Web3j web3j, List<TezosColumnHandle> columnHandles, TezosSplit split) {
+    TezosRecordSet(TezosClient tezosClient, List<TezosColumnHandle> columnHandles, TezosSplit split) {
         this.split = requireNonNull(split, "split is null");
-        this.web3j = requireNonNull(web3j, "web3j is null");
+        this.tezosClient = requireNonNull(tezosClient, "TezosClient is null");
 
         this.columnHandles = requireNonNull(columnHandles, "columnHandles is null");
 
@@ -44,12 +41,12 @@ public class TezosRecordSet implements RecordSet {
 
     @Override
     public RecordCursor cursor() {
-        EthBlock block = null;
+        Block block = null; //TODO change to block! name problem from!
         try {
-            block = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(split.getBlockId())), true).send();
+            block = tezosClient.getBlock(split.getBlockId());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new TezosRecordCursor(columnHandles, block, split.getTable(), web3j);
+        return new TezosRecordCursor(columnHandles, block, split.getTable(), tezosClient);
     }
 }

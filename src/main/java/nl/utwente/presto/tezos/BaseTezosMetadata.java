@@ -4,18 +4,18 @@ import com.facebook.presto.common.type.Type;
 import com.facebook.presto.spi.*;
 import com.facebook.presto.spi.connector.ConnectorMetadata;
 import com.google.common.collect.ImmutableList;
+import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.handle.TezosTableHandle;
-import io.airlift.log.Logger;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
 import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertColumnHandle;
 import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertTableHandle;
-import static java.util.Objects.requireNonNull;
 
 public abstract class BaseTezosMetadata implements ConnectorMetadata {
     protected static final Logger log = Logger.get(TezosMetadata.class);

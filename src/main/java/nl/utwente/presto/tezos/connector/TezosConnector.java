@@ -1,17 +1,13 @@
 package nl.utwente.presto.tezos.connector;
 
-import com.facebook.presto.spi.connector.Connector;
-import com.facebook.presto.spi.connector.ConnectorMetadata;
-import com.facebook.presto.spi.connector.ConnectorRecordSetProvider;
-import com.facebook.presto.spi.connector.ConnectorSplitManager;
-import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
+import com.facebook.presto.spi.connector.*;
 import com.facebook.presto.spi.transaction.IsolationLevel;
+import io.airlift.bootstrap.LifeCycleManager;
+import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.TezosMetadata;
 import nl.utwente.presto.tezos.TezosRecordSetProvider;
 import nl.utwente.presto.tezos.TezosSplitManager;
 import nl.utwente.presto.tezos.handle.TezosTransactionHandle;
-import io.airlift.bootstrap.LifeCycleManager;
-import io.airlift.log.Logger;
 
 import javax.inject.Inject;
 
