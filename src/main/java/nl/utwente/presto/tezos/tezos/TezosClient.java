@@ -52,7 +52,8 @@ public class TezosClient {
             String json = doGetRequest(endpoint+"/tables/block?columns="+getBlocksColumns()+"&limit=50000&height.in="+heightsIn);
             return new ObjectMapper()
                     .registerModule(new SimpleModule()
-                            .addDeserializer(Block.class, new BlockTableDeserializer()))
+                            .addDeserializer(Block.class, new BlockTableDeserializer())
+                            .addDeserializer(Contract.class, new ContractTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
                     .forType(new TypeReference<List<Block>>() {})
@@ -69,7 +70,8 @@ public class TezosClient {
             String json = doGetRequest(endpoint+"/tables/block?columns="+getBlocksColumns()+"&limit=50000&hash.in="+hashesIn);
             return new ObjectMapper()
                     .registerModule(new SimpleModule()
-                            .addDeserializer(Block.class, new BlockTableDeserializer()))
+                            .addDeserializer(Block.class, new BlockTableDeserializer())
+                            .addDeserializer(Contract.class, new ContractTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
                     .forType(new TypeReference<List<Block>>() {})
@@ -84,6 +86,17 @@ public class TezosClient {
         return "hash,predecessor,baker,height,cycle,is_cycle_snapshot,time,solvetime,version,fitness,priority,nonce,voting_period_kind,slot_mask,n_endorsed_slots,n_ops,n_ops_failed,n_ops_contract,n_contract_calls,n_tx,n_activation,n_seed_nonce_revelation,n_double_baking_evidence,n_double_endorsement_evidence,n_endorsement,n_delegation,n_reveal,n_origination,n_proposal,n_ballot,n_register_constant,volume,fee,reward,deposit,activated_supply,burned_supply,n_accounts,n_new_accounts,n_new_contracts,n_cleared_accounts,n_funded_accounts,gas_limit,gas_used,gas_price,storage_size,days_destroyed,pct_account_reuse,n_ops_implicit,lb_esc_vote,lb_esc_ema";
     }
 
+    public Contract getContract(String hash) throws IOException{
+        try {
+            String json = doGetRequest(endpoint+"/explorer/contract/"+hash);
+            return new ObjectMapper()
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .readValue(json,  Contract.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get contract " +hash);
+        }
+    }
     private String doGetRequest(String url) throws Exception {
         HttpURLConnection urlConnection = (HttpURLConnection) (new URL(url)).openConnection();
         urlConnection.setRequestMethod("GET");

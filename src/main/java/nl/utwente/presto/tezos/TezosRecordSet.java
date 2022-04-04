@@ -41,7 +41,7 @@ public class TezosRecordSet implements RecordSet {
 
     @Override
     public RecordCursor cursor() {
-        Block block = null; //TODO change to block! name problem from!
+        Block block = null;
         try {
             block = tezosClient.getBlock(split.getBlockId());
         } catch (IOException e) {
