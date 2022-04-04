@@ -5,7 +5,8 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum TezosTable {
-    BLOCK("block");
+    BLOCK("block"),
+    ELECTION("election");
 
     @Getter
     private final String name;

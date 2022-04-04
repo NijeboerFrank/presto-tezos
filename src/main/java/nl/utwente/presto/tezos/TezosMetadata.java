@@ -177,7 +177,26 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_nOpsImplicit", BigintType.BIGINT));
             builder.add(new Pair<>("block_lbEscVote", BooleanType.BOOLEAN));
             builder.add(new Pair<>("block_lbEscEma", BigintType.BIGINT));
-        } else {
+        } else if (TezosTable.ELECTION.getName().equals(table)) {
+            builder.add(new Pair<>("row_id", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_id", BigintType.BIGINT));
+            builder.add(new Pair<>("num_periods", BigintType.BIGINT));
+            builder.add(new Pair<>("num_proposals", BigintType.BIGINT));
+            builder.add(new Pair<>("voting_period", BigintType.BIGINT));
+            builder.add(new Pair<>("start_time", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("end_time", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("start_height", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("end_height", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("is_empty", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("is_open", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("is_failed", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("no_quorum", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("no_majority", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("proposal", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("last_voting_period", VarcharType.createUnboundedVarcharType()));
+        }
+
+        else {
             throw new IllegalArgumentException("Unknown Table Name " + table);
         }
 

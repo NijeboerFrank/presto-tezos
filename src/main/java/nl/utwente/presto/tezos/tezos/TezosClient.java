@@ -84,6 +84,44 @@ public class TezosClient {
         return "hash,predecessor,baker,height,cycle,is_cycle_snapshot,time,solvetime,version,round,nonce,voting_period_kind,n_endorsed_slots,n_ops_applied,n_ops_failed,volume,fee,reward,deposit,activated_supply,burned_supply,n_accounts,n_new_accounts,n_new_contracts,n_cleared_accounts,n_funded_accounts,gas_limit,gas_used,storage_paid,pct_account_reuse,n_events,lb_esc_vote,lb_esc_ema";
     }
 
+    private String getElectionColumns() {
+        return "row_id,proposal_id,num_periods,num_proposals,voting_period,start_time,end_time,start_height,end_height,is_empty,is_open,is_failed,no_quorum,no_majority,proposal,last_voting_period";
+    }
+
+    public List<Election> getElections(long[] proposalIds) throws IOException {
+        String proposalIdList = Arrays.stream(proposalIds).mapToObj(String::valueOf).collect(Collectors.joining(","));
+        try {
+            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&proposal_id.in="+proposalIdList);
+            return new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Election.class, new ElectionTableDeserializer()))
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .reader()
+                    .forType(new TypeReference<List<Election>>() {})
+                    .readValue(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get elections "+proposalIdList);
+        }
+    }
+
+    public List<Election> getElections(String[] proposals) throws IOException {
+        String electionString = String.join(",", proposals);
+        try {
+            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&proposal.in="+electionString);
+            return new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Election.class, new ElectionTableDeserializer()))
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .reader()
+                    .forType(new TypeReference<List<Election>>() {})
+                    .readValue(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get elections "+electionString);
+        }
+    }
+
     private String doGetRequest(String url) throws Exception {
         HttpURLConnection urlConnection = (HttpURLConnection) (new URL(url)).openConnection();
         urlConnection.setRequestMethod("GET");
