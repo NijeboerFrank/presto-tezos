@@ -81,7 +81,7 @@ public class TezosClient {
     }
 
     private String getBlocksColumns() {
-        return "hash,predecessor,baker,height,cycle,is_cycle_snapshot,time,solvetime,version,fitness,priority,nonce,voting_period_kind,slot_mask,n_endorsed_slots,n_ops,n_ops_failed,n_ops_contract,n_contract_calls,n_tx,n_activation,n_seed_nonce_revelation,n_double_baking_evidence,n_double_endorsement_evidence,n_endorsement,n_delegation,n_reveal,n_origination,n_proposal,n_ballot,n_register_constant,volume,fee,reward,deposit,activated_supply,burned_supply,n_accounts,n_new_accounts,n_new_contracts,n_cleared_accounts,n_funded_accounts,gas_limit,gas_used,gas_price,storage_size,days_destroyed,pct_account_reuse,n_ops_implicit,lb_esc_vote,lb_esc_ema";
+        return "hash,predecessor,baker,height,cycle,is_cycle_snapshot,time,solvetime,version,round,nonce,voting_period_kind,n_endorsed_slots,n_ops_applied,n_ops_failed,volume,fee,reward,deposit,activated_supply,burned_supply,n_accounts,n_new_accounts,n_new_contracts,n_cleared_accounts,n_funded_accounts,gas_limit,gas_used,storage_paid,pct_account_reuse,n_events,lb_esc_vote,lb_esc_ema";
     }
 
     private String doGetRequest(String url) throws Exception {
