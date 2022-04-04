@@ -17,11 +17,11 @@ public class TezosClientTest {
         assertEquals("BLSqrcLvFtqVCx8WSqkVJypW2kAVRM3eEj2BHgBsB6kb24NqYev", block.getHash());
     }
 
-    @Test
-    public void testBlocks() throws IOException {
-        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
-        List<Block> block = tezosClient.getBlocks(new long[] { 1, 2 });
-        assertTrue(block.stream().anyMatch(b -> b.getHeight() == 1));
-        assertTrue(block.stream().anyMatch(b -> b.getHeight() == 2));
-    }
+//    @Test
+//    public void testBlocks() throws IOException {
+//        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+//        List<Block> block = tezosClient.getBlocks(new long[] { 1, 2 });
+//        assertTrue(block.stream().anyMatch(b -> b.getHeight() == 1));
+//        assertTrue(block.stream().anyMatch(b -> b.getHeight() == 2));
+//    }
 }
