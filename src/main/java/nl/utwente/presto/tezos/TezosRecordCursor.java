@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.tezos.Block;
+import nl.utwente.presto.tezos.tezos.Contract;
 import nl.utwente.presto.tezos.tezos.TezosClient;
 
 import java.util.Iterator;
@@ -17,6 +18,9 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
     private final Block block;
     private final Iterator<Block> blockIter;
+//    private final Contract contract;
+//    private final Iterator<Contract> contractIter;
+
 
     private final TezosTable table;
 
@@ -96,6 +100,8 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             builder.add(block::isLbEscVote);
             builder.add(block::getLbEscEma);
 
+//        } else if (table == TezosTable.BLOCK) {
+//            builder.add(contract::)
         } else {
             return false;
         }

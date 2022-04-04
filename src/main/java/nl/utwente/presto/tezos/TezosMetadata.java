@@ -177,6 +177,10 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_nOpsImplicit", BigintType.BIGINT));
             builder.add(new Pair<>("block_lbEscVote", BooleanType.BOOLEAN));
             builder.add(new Pair<>("block_lbEscEma", BigintType.BIGINT));
+        } else if (TezosTable.CONTRACT.getName().equals(table)) {
+            builder.add(new Pair<>("contract_account_id", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_address", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_creator", VarcharType.createUnboundedVarcharType()));
         } else {
             throw new IllegalArgumentException("Unknown Table Name " + table);
         }
