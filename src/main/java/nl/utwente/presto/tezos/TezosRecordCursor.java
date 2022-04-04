@@ -20,7 +20,8 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
     private final TezosTable table;
 
-    public TezosRecordCursor(List<TezosColumnHandle> columnHandles, Block block, TezosTable table, TezosClient tezosClient) {
+    public TezosRecordCursor(List<TezosColumnHandle> columnHandles, Block block, TezosTable table,
+            TezosClient tezosClient) {
         super(columnHandles);
 
         this.table = table;
@@ -36,7 +37,8 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
 
     @Override
     public boolean advanceNextPosition() {
-        if (table == TezosTable.BLOCK && !blockIter.hasNext()) {
+        if (table == TezosTable.BLOCK && !blockIter.hasNext()
+                || table == TezosTable.OPERATION && !blockIter.hasNext()) {
             return false;
         }
 
@@ -96,6 +98,8 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             builder.add(block::isLbEscVote);
             builder.add(block::getLbEscEma);
 
+        } else if (table == TezosTable.OPERATION) {
+            // TODO for operation
         } else {
             return false;
         }

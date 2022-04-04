@@ -34,49 +34,67 @@ public class TezosClient {
         return getBlock(String.valueOf(height));
     }
 
-    public Block getBlock(String hash) throws IOException {
+    public Operation getOperation(String hash) throws IOException {
         try {
-            String json = doGetRequest(endpoint+"/explorer/block/"+hash);
+            String json = doGetRequest(endpoint + "/explorer/op/" + hash);
             return new ObjectMapper()
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .readValue(json,  Block.class);
+                    .readValue(json, Operation.class);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get block "+hash);
+            throw new IOException("Failed to get block " + hash);
+        }
+    }
+
+    // TODO for operation, get operation by something else than a single hash
+
+    public Block getBlock(String hash) throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/explorer/block/" + hash);
+            return new ObjectMapper()
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .readValue(json, Block.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get block " + hash);
         }
     }
 
     public List<Block> getBlocks(long[] heights) throws IOException {
         String heightsIn = Arrays.stream(heights).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
-            String json = doGetRequest(endpoint+"/tables/block?columns="+getBlocksColumns()+"&limit=50000&height.in="+heightsIn);
+            String json = doGetRequest(
+                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.in=" + heightsIn);
             return new ObjectMapper()
                     .registerModule(new SimpleModule()
                             .addDeserializer(Block.class, new BlockTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
-                    .forType(new TypeReference<List<Block>>() {})
+                    .forType(new TypeReference<List<Block>>() {
+                    })
                     .readValue(json);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get blocks "+heightsIn);
+            throw new IOException("Failed to get blocks " + heightsIn);
         }
     }
 
     public List<Block> getBlocks(String[] hashes) throws IOException {
         String hashesIn = String.join(",", hashes);
         try {
-            String json = doGetRequest(endpoint+"/tables/block?columns="+getBlocksColumns()+"&limit=50000&hash.in="+hashesIn);
+            String json = doGetRequest(
+                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&hash.in=" + hashesIn);
             return new ObjectMapper()
                     .registerModule(new SimpleModule()
                             .addDeserializer(Block.class, new BlockTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
-                    .forType(new TypeReference<List<Block>>() {})
+                    .forType(new TypeReference<List<Block>>() {
+                    })
                     .readValue(json);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get blocks "+hashesIn);
+            throw new IOException("Failed to get blocks " + hashesIn);
         }
     }
 

@@ -33,8 +33,7 @@ public class TezosMetadata extends BaseTezosMetadata {
 
     @Inject
     public TezosMetadata(
-            TezosClientProvider provider
-    ) {
+            TezosClientProvider provider) {
         this.tezosClient = requireNonNull(provider, "provider is null").getTezosClient();
     }
 
@@ -106,6 +105,8 @@ public class TezosMetadata extends BaseTezosMetadata {
                         });
                         log.info(entry.getValue().getValues().toString(null));
                         break;
+
+                    // TODO for operation
                 }
             }
         }
@@ -177,6 +178,14 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_nOpsImplicit", BigintType.BIGINT));
             builder.add(new Pair<>("block_lbEscVote", BooleanType.BOOLEAN));
             builder.add(new Pair<>("block_lbEscEma", BigintType.BIGINT));
+        } else if (TezosTable.OPERATION.getName().equals(table)) {
+            builder.add(new Pair<>("operation_id", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_hash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_type", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_block", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_time", TimestampType.TIMESTAMP));
+            // TODO include more fields from
+            // https://tzstats.com/docs/api/index.html?shell#operations
         } else {
             throw new IllegalArgumentException("Unknown Table Name " + table);
         }
