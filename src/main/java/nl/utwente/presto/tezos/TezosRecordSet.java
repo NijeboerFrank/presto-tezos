@@ -41,12 +41,20 @@ public class TezosRecordSet implements RecordSet {
 
     @Override
     public RecordCursor cursor() {
-        Block block = null; //TODO change to block! name problem from!
-        try {
-            block = tezosClient.getBlock(split.getBlockId());
-        } catch (IOException e) {
-            e.printStackTrace();
+        Block block = null; // TODO change to block! name problem from!
+        log.info("Table is %s", split.getTable());
+        switch(split.getTable()) {
+            case BLOCK:
+                try {
+                    block = tezosClient.getBlock(split.getBlockId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return new TezosBlockRecordCursor(columnHandles, block, split.getTable(), tezosClient);
+            case ELECTION:
+                return new TezosElectionRecordCursor(columnHandles, null, split.getTable(), tezosClient);
+            default:
+                return null;
         }
-        return new TezosRecordCursor(columnHandles, block, split.getTable(), tezosClient);
     }
 }

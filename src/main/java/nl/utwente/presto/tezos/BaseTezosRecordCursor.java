@@ -6,6 +6,8 @@ import com.facebook.presto.common.block.PageBuilderStatus;
 import com.facebook.presto.common.type.StandardTypes;
 import com.facebook.presto.common.type.Type;
 import com.facebook.presto.spi.RecordCursor;
+
+import io.airlift.log.Logger;
 import io.airlift.slice.Slice;
 import io.airlift.slice.Slices;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;

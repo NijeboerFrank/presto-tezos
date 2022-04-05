@@ -23,8 +23,8 @@ public class Election {
     private long startHeight;
     private long endHeight;
     private boolean isEmpty;
-    private boolean isopen;
-    private boolean isfailed;
+    private boolean isOpen;
+    private boolean isFailed;
     private boolean noQuorum;
     private boolean nonMajority;
     private String proposal;
