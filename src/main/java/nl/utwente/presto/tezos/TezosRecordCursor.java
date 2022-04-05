@@ -53,6 +53,7 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             builder.add(block::getTimestampMillis);
             builder.add(block::getSolvetime);
             builder.add(block::getVersion);
+            builder.add(block::getRound);
             builder.add(block::getNonce);
             builder.add(block::getVotingPeriodKind);
             builder.add(block::getNEndorsedSlots);
