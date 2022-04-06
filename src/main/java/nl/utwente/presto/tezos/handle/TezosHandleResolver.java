@@ -2,6 +2,9 @@ package nl.utwente.presto.tezos.handle;
 
 import com.facebook.presto.spi.*;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
+
+import nl.utwente.presto.tezos.BaseTezosSplit;
+import nl.utwente.presto.tezos.TezosBlockSplit;
 import nl.utwente.presto.tezos.TezosElectionSplit;
 
 import static com.google.common.base.Preconditions.checkArgument;

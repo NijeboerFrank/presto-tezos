@@ -13,6 +13,9 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class TezosElectionRecordCursor extends BaseTezosRecordCursor {
     private static final Logger log = Logger.get(TezosBlockRecordCursor.class);
 
@@ -21,14 +24,19 @@ public class TezosElectionRecordCursor extends BaseTezosRecordCursor {
 
     private final TezosTable table;
 
-    public TezosElectionRecordCursor(List<TezosColumnHandle> columnHandles, Election election, TezosTable table, TezosClient tezosClient) {
+    public TezosElectionRecordCursor(List<TezosColumnHandle> columnHandles, Election election, TezosTable table,
+            TezosClient tezosClient) {
 
         super(columnHandles);
 
         this.table = table;
 
         this.election = election;
-        this.electionIter = ImmutableList.of(election).iterator();
+        if (election != null) {
+            this.electionIter = ImmutableList.of(election).iterator();
+        } else {
+            this.electionIter = Collections.emptyIterator();
+        }
     }
 
     @Override

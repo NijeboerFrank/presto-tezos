@@ -20,7 +20,8 @@ public class TezosBlockRecordCursor extends BaseTezosRecordCursor {
 
     private final TezosTable table;
 
-    public TezosBlockRecordCursor(List<TezosColumnHandle> columnHandles, Block block, TezosTable table, TezosClient tezosClient) {
+    public TezosBlockRecordCursor(List<TezosColumnHandle> columnHandles, Block block, TezosTable table,
+            TezosClient tezosClient) {
         super(columnHandles);
 
         this.table = table;
@@ -77,9 +78,6 @@ public class TezosBlockRecordCursor extends BaseTezosRecordCursor {
             builder.add(block::getNEvents);
             builder.add(block::isLbEscVote);
             builder.add(block::getLbEscEma);
-        } else if (table == TezosTable.ELECTION) {
-            blockIter.next();
-
         } else {
             return false;
         }

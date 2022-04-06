@@ -92,13 +92,18 @@ public class TezosClient {
     public Election getElection(long proposalId) throws IOException {
         try {
             String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&proposal_id="+proposalId);
-            return new ObjectMapper()
+            List<Election> resp = new ObjectMapper()
                     .registerModule(new SimpleModule()
                             .addDeserializer(Election.class, new ElectionTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
                     .forType(new TypeReference<List<Election>>() {})
                     .readValue(json);
+            if (resp.size() > 0) {
+                return resp.get(0);
+            } else {
+                return null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get election "+proposalId);

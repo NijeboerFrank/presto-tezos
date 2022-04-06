@@ -32,4 +32,11 @@ public class TezosClientTest {
         assertTrue(elections.stream().anyMatch(b -> b.getProposalId() == 1));
         assertTrue(elections.stream().anyMatch(b -> b.getProposalId() == 3));
     }
+
+    @Test
+    public void testElection() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Election election = tezosClient.getElection(1);
+        assertTrue(election.getProposalId() == 1);
+    }
 }

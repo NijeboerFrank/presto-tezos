@@ -106,6 +106,9 @@ public class TezosMetadata extends BaseTezosMetadata {
                         });
                         log.info(entry.getValue().getValues().toString(null));
                         break;
+
+                    case "proposal_id":
+
                 }
             }
         }
