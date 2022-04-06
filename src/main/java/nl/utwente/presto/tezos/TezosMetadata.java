@@ -53,7 +53,7 @@ public class TezosMetadata extends BaseTezosMetadata {
             ConnectorTableHandle table,
             Constraint<ColumnHandle> constraint,
             Optional<Set<ColumnHandle>> desiredColumns) {
-        ImmutableList.Builder<TezosBlockRange> builder = ImmutableList.builder();
+        ImmutableList.Builder<TezosRange> builder = ImmutableList.builder();
 
         Optional<Map<ColumnHandle, Domain>> domains = constraint.getSummary().getDomains();
         if (domains.isPresent()) {
@@ -71,7 +71,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                         orderedRanges.forEach(r -> {
                             Marker low = r.getLow();
                             Marker high = r.getHigh();
-                            builder.add(TezosBlockRange.fromMarkers(low, high));
+                            builder.add(TezosRange.fromMarkers(low, high));
                         });
                         break;
                     case "block_hash":
@@ -82,7 +82,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                                     String blockHash = ((Slice) r.getSingleValue()).toStringUtf8();
                                     try {
                                         long blockNumber = tezosClient.getBlock(blockHash).getNumber().longValue();
-                                        builder.add(new TezosBlockRange(blockNumber, blockNumber));
+                                        builder.add(new TezosRange(blockNumber, blockNumber));
                                     } catch (IOException e) {
                                         throw new IllegalStateException("Unable to getting block by hash " + blockHash);
                                     }
@@ -99,7 +99,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                                         : findBlockByTimestamp((Long) low.getValue(), -1L);
                                 long endBlock = high.isUpperUnbounded() ? -1L
                                         : findBlockByTimestamp((Long) high.getValue(), 1L);
-                                builder.add(new TezosBlockRange(startBlock, endBlock));
+                                builder.add(new TezosRange(startBlock, endBlock));
                             } catch (IOException e) {
                                 throw new IllegalStateException("Unable to find block by timestamp");
                             }

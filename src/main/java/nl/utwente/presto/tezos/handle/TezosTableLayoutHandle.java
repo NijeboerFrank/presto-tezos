@@ -4,7 +4,7 @@ import com.facebook.presto.spi.ConnectorTableLayoutHandle;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
-import nl.utwente.presto.tezos.TezosBlockRange;
+import nl.utwente.presto.tezos.TezosRange;
 
 import java.util.List;
 
@@ -14,12 +14,12 @@ import static java.util.Objects.requireNonNull;
 public class TezosTableLayoutHandle implements ConnectorTableLayoutHandle {
     private final TezosTableHandle table;
 
-    private final List<TezosBlockRange> blockRanges;
+    private final List<TezosRange> blockRanges;
 
     @JsonCreator
     public TezosTableLayoutHandle(
             @JsonProperty("table") TezosTableHandle table,
-            @JsonProperty("blockRanges") List<TezosBlockRange> blockRanges
+            @JsonProperty("blockRanges") List<TezosRange> blockRanges
     ) {
         this.table = requireNonNull(table, "table is null");
         this.blockRanges = requireNonNull(blockRanges, "blockRanges is null");
@@ -31,7 +31,7 @@ public class TezosTableLayoutHandle implements ConnectorTableLayoutHandle {
     }
 
     @JsonProperty
-    public List<TezosBlockRange> getBlockRanges() {
+    public List<TezosRange> getBlockRanges() {
         return blockRanges;
     }
 }

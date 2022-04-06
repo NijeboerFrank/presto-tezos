@@ -57,18 +57,18 @@ public class TezosSplitManager implements ConnectorSplitManager {
             List<ConnectorSplit> connectorSplits;
             if (tableLayoutHandle.getBlockRanges().isEmpty()) {
                 connectorSplits = LongStream.range(0, lastBlockNumber + 1)
-                        .mapToObj(blockNumber -> new TezosSplit(blockNumber, table))
+                        .mapToObj(blockNumber -> new TezosElectionSplit(blockNumber, table))
                         .collect(Collectors.toList());
             } else {
                 connectorSplits = tableLayoutHandle.getBlockRanges()
                         .stream()
                         .flatMap(blockRange ->
                                 LongStream.range(
-                                        blockRange.getStartBlock(),
-                                        blockRange.getEndBlock() == -1 ? lastBlockNumber : blockRange.getEndBlock() + 1
+                                        blockRange.getStart(),
+                                        blockRange.getEnd() == -1 ? lastBlockNumber : blockRange.getEnd() + 1
                                 ).boxed()
                         )
-                        .map(blockNumber -> new TezosSplit(blockNumber, table))
+                        .map(blockNumber -> new TezosElectionSplit(blockNumber, table))
                         .collect(Collectors.toList());
             }
 

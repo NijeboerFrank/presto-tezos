@@ -88,6 +88,23 @@ public class TezosClient {
         return "row_id,proposal_id,num_periods,num_proposals,voting_period,start_time,end_time,start_height,end_height,is_empty,is_open,is_failed,no_quorum,no_majority,proposal,last_voting_period";
     }
 
+
+    public Election getElection(long proposalId) throws IOException {
+        try {
+            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&proposal_id="+proposalId);
+            return new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Election.class, new ElectionTableDeserializer()))
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .reader()
+                    .forType(new TypeReference<List<Election>>() {})
+                    .readValue(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get election "+proposalId);
+        }
+    }
+
     public List<Election> getElections(long[] proposalIds) throws IOException {
         String proposalIdList = Arrays.stream(proposalIds).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {

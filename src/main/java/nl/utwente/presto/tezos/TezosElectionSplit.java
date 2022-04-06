@@ -10,30 +10,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
 import java.util.List;
 
-public class TezosSplit implements ConnectorSplit {
-    private final long blockId;
-    private final String blockHash;
+public class TezosElectionSplit implements BaseTezosSplit {
+    private final long proposalId;
 
     private final TezosTable table;
 
     @JsonCreator
-    public TezosSplit(
-            @JsonProperty("blockId") long blockId,
+    public TezosElectionSplit(
+            @JsonProperty("proposalId") long proposalId,
             @JsonProperty("table") TezosTable table
     ) {
-        this.blockId = blockId;
+        this.proposalId = proposalId;
         this.table = table;
-        this.blockHash = null;
     }
 
     @JsonProperty
-    public long getBlockId() {
-        return blockId;
-    }
-
-    @JsonProperty
-    public String getBlockHash() {
-        return blockHash;
+    public long getProposalId() {
+        return proposalId;
     }
 
     @JsonProperty

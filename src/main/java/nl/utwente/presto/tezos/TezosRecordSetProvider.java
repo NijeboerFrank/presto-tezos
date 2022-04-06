@@ -32,7 +32,7 @@ public class TezosRecordSetProvider implements ConnectorRecordSetProvider {
             ConnectorSplit split,
             List<? extends ColumnHandle> columns
     ) {
-        TezosSplit tezosSplit = convertSplit(split);
+        TezosElectionSplit tezosSplit = convertSplit(split);
 
         List<TezosColumnHandle> columnHandles = columns.stream()
                 .map(TezosHandleResolver::convertColumnHandle)
