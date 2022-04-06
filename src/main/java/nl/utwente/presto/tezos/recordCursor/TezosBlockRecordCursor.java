@@ -1,7 +1,9 @@
-package nl.utwente.presto.tezos;
+package nl.utwente.presto.tezos.recordCursor;
 
 import com.google.common.collect.ImmutableList;
 import io.airlift.log.Logger;
+import nl.utwente.presto.tezos.TezosMetadata;
+import nl.utwente.presto.tezos.TezosTable;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.tezos.Block;
 import nl.utwente.presto.tezos.tezos.TezosClient;

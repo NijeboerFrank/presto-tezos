@@ -92,6 +92,10 @@ public class TezosClient {
         return "row_id,proposal_id,num_periods,num_proposals,voting_period,start_time,end_time,start_height,end_height,is_empty,is_open,is_failed,no_quorum,no_majority,proposal,last_voting_period";
     }
 
+    private String getProposalColumns() {
+        return "row_id,hash,height,time,source_id,op_id,election_id,voting_period,rolls,voters,source,op";
+    }
+
     public Election getElection(long electionId) throws IOException {
         try {
             String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&row_id="+electionId);
@@ -111,6 +115,28 @@ public class TezosClient {
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get election "+electionId);
+        }
+    }
+
+    public Proposal getProposal(long proposalId) throws IOException {
+        try {
+            String json = doGetRequest(endpoint+"/tables/proposal?columns="+getProposalColumns()+"&limit=50000&row_id="+proposalId);
+            List<Proposal> resp = new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Proposal.class, new ProposalTableDeserializer()))
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .reader()
+                    .forType(new TypeReference<List<Proposal>>() {
+                    })
+                    .readValue(json);
+            if (resp.size() > 0) {
+                return resp.get(0);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get proposal "+proposalId);
         }
     }
 

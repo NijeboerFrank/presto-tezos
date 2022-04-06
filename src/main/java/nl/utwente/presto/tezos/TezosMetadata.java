@@ -76,6 +76,13 @@ public class TezosMetadata extends BaseTezosMetadata {
                             builder.add(TezosRange.fromMarkers(columnName, low, high));
                         });
                         break;
+                    case "proposal_id":
+                        orderedRanges.forEach(r -> {
+                            Marker low = r.getLow();
+                            Marker high = r.getHigh();
+                            builder.add(TezosRange.fromMarkers(columnName, low, high));
+                        });
+                        break;
                     case "block_hash":
                     case "tx_blockHash":
                         // Limit query to block hash range
@@ -178,6 +185,19 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("election_noMajority", BooleanType.BOOLEAN));
             builder.add(new Pair<>("election_proposal", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("election_lastVotingPeriod", VarcharType.createUnboundedVarcharType()));
+        } else if (TezosTable.PROPOSAL.getName().equals(table)) {
+            builder.add(new Pair<>("proposal_id", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_hash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_height", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_time", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_sourceId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_opId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_electionId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_votingPeriod", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_rolls", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_voters", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_source", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_op", VarcharType.createUnboundedVarcharType()));
         }
 
         else {

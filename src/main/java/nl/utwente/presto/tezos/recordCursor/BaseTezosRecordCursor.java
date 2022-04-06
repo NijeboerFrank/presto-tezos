@@ -1,4 +1,4 @@
-package nl.utwente.presto.tezos;
+package nl.utwente.presto.tezos.recordCursor;
 
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.common.block.BlockBuilder;
