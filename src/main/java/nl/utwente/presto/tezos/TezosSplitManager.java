@@ -58,7 +58,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
                 case BLOCK:
                     if (tableLayoutHandle.getRanges().isEmpty()) {
                         connectorSplits = LongStream.range(0, lastBlockNumber + 1)
-                                .mapToObj(blockNumber -> new TezosSplit(table, blockNumber, 0))
+                                .mapToObj(TezosSplit::forBlock)
                                 .collect(Collectors.toList());
                     } else {
                         connectorSplits = tableLayoutHandle.getRanges()
@@ -66,7 +66,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
                                 .flatMap(blockRange -> LongStream.range(
                                         blockRange.getStart(),
                                         blockRange.getEnd() == -1 ? lastBlockNumber : blockRange.getEnd() + 1).boxed())
-                                .map(blockNumber -> new TezosSplit(table, blockNumber, 0))
+                                .map(TezosSplit::forBlock)
                                 .collect(Collectors.toList());
                     }
 
@@ -76,7 +76,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
                     long lastElection = 39;
                     if (tableLayoutHandle.getRanges().isEmpty()) {
                         connectorSplits = LongStream.range(0, lastElection + 1)
-                                .mapToObj(blockNumber -> new TezosSplit(table, 0, blockNumber))
+                                .mapToObj(TezosSplit::forElection)
                                 .collect(Collectors.toList());
                     } else {
                         connectorSplits = tableLayoutHandle.getRanges()
@@ -84,7 +84,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
                                 .flatMap(blockRange -> LongStream.range(
                                         blockRange.getStart(),
                                         blockRange.getEnd() == -1 ? lastElection : blockRange.getEnd() + 1).boxed())
-                                .map(proposalId -> new TezosSplit(table, 0, proposalId))
+                                .map(TezosSplit::forElection)
                                 .collect(Collectors.toList());
                     }
                     log.info("Built %d splits", connectorSplits.size());

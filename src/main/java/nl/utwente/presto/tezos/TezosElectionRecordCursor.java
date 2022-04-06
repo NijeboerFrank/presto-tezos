@@ -3,18 +3,13 @@ package nl.utwente.presto.tezos;
 import com.google.common.collect.ImmutableList;
 import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
-import nl.utwente.presto.tezos.tezos.Block;
 import nl.utwente.presto.tezos.tezos.Election;
 import nl.utwente.presto.tezos.tezos.TezosClient;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
-
-import static java.util.Objects.requireNonNull;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class TezosElectionRecordCursor extends BaseTezosRecordCursor {
     private static final Logger log = Logger.get(TezosBlockRecordCursor.class);
@@ -42,7 +37,6 @@ public class TezosElectionRecordCursor extends BaseTezosRecordCursor {
     @Override
     public long getCompletedBytes() {
         return 0;
-        // return election.getElection().getNumProposals();
     }
 
     @Override
