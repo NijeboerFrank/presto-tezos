@@ -5,10 +5,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TezosRange {
+    private final String column;
     private final long start;
     private final long end;
 
-    public static TezosRange fromMarkers(Marker low, Marker high) {
+    public static TezosRange fromMarkers(String column, Marker low, Marker high) {
         long start;
         long end;
         if (low.isLowerUnbounded()) {
@@ -35,14 +36,16 @@ public class TezosRange {
             throw new IllegalArgumentException("Low bound is greater than high bound");
         }
 
-        return new TezosRange(start, end);
+        return new TezosRange(column, start, end);
     }
 
     @JsonCreator
     public TezosRange(
+            @JsonProperty("column") String column,
             @JsonProperty("start") long start,
             @JsonProperty("end") long end
     ) {
+        this.column = column;
         this.start = start;
         this.end = end;
     }
@@ -55,5 +58,10 @@ public class TezosRange {
     @JsonProperty
     public long getEnd() {
         return end;
+    }
+
+    @JsonProperty
+    public String getColumn() {
+        return column;
     }
 }

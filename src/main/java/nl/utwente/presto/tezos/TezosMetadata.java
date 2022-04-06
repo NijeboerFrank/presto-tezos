@@ -67,11 +67,13 @@ public class TezosMetadata extends BaseTezosMetadata {
 
                 switch (columnName) {
                     case "block_height":
+                    case "election_id":
+                        // TODO Filter on proposal ID
                         // Limit query to block number range
                         orderedRanges.forEach(r -> {
                             Marker low = r.getLow();
                             Marker high = r.getHigh();
-                            builder.add(TezosRange.fromMarkers(low, high));
+                            builder.add(TezosRange.fromMarkers(columnName, low, high));
                         });
                         break;
                     case "block_hash":
@@ -82,7 +84,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                                     String blockHash = ((Slice) r.getSingleValue()).toStringUtf8();
                                     try {
                                         long blockNumber = tezosClient.getBlock(blockHash).getNumber().longValue();
-                                        builder.add(new TezosRange(blockNumber, blockNumber));
+                                        builder.add(new TezosRange(columnName, blockNumber, blockNumber));
                                     } catch (IOException e) {
                                         throw new IllegalStateException("Unable to getting block by hash " + blockHash);
                                     }
@@ -99,16 +101,13 @@ public class TezosMetadata extends BaseTezosMetadata {
                                         : findBlockByTimestamp((Long) low.getValue(), -1L);
                                 long endBlock = high.isUpperUnbounded() ? -1L
                                         : findBlockByTimestamp((Long) high.getValue(), 1L);
-                                builder.add(new TezosRange(startBlock, endBlock));
+                                builder.add(new TezosRange(columnName, startBlock, endBlock));
                             } catch (IOException e) {
                                 throw new IllegalStateException("Unable to find block by timestamp");
                             }
                         });
                         log.info(entry.getValue().getValues().toString(null));
                         break;
-
-                    case "proposal_id":
-
                 }
             }
         }
@@ -163,22 +162,22 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_lbEscVote", BooleanType.BOOLEAN));
             builder.add(new Pair<>("block_lbEscEma", BigintType.BIGINT));
         } else if (TezosTable.ELECTION.getName().equals(table)) {
-            builder.add(new Pair<>("row_id", BigintType.BIGINT));
-            builder.add(new Pair<>("proposal_id", BigintType.BIGINT));
-            builder.add(new Pair<>("num_periods", BigintType.BIGINT));
-            builder.add(new Pair<>("num_proposals", BigintType.BIGINT));
-            builder.add(new Pair<>("voting_period", BigintType.BIGINT));
-            builder.add(new Pair<>("start_time", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("end_time", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("start_height", BigintType.BIGINT));
-            builder.add(new Pair<>("end_height", BigintType.BIGINT));
-            builder.add(new Pair<>("is_empty", BooleanType.BOOLEAN));
-            builder.add(new Pair<>("is_open", BooleanType.BOOLEAN));
-            builder.add(new Pair<>("is_failed", BooleanType.BOOLEAN));
-            builder.add(new Pair<>("no_quorum", BooleanType.BOOLEAN));
-            builder.add(new Pair<>("no_majority", BooleanType.BOOLEAN));
-            builder.add(new Pair<>("proposal", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("last_voting_period", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("election_id", BigintType.BIGINT));
+            builder.add(new Pair<>("election_proposalId", BigintType.BIGINT));
+            builder.add(new Pair<>("election_numPeriods", BigintType.BIGINT));
+            builder.add(new Pair<>("election_numProposals", BigintType.BIGINT));
+            builder.add(new Pair<>("election_votingPeriod", BigintType.BIGINT));
+            builder.add(new Pair<>("election_startTime", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("election_endTime", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("election_startHeight", BigintType.BIGINT));
+            builder.add(new Pair<>("election_endHeight", BigintType.BIGINT));
+            builder.add(new Pair<>("election_isEmpty", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_isOpen", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_isFailed", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_noQuorum", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_noMajority", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_proposal", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("election_lastVotingPeriod", VarcharType.createUnboundedVarcharType()));
         }
 
         else {

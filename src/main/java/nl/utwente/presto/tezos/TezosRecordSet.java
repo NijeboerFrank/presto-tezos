@@ -55,7 +55,8 @@ public class TezosRecordSet implements RecordSet {
             case ELECTION:
                 Election election = null;
                 try {
-                    election = tezosClient.getElection(split.getProposalId());
+                    // TODO Also get election by proposal ID
+                    election = tezosClient.getElection(split.getElectionId());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
