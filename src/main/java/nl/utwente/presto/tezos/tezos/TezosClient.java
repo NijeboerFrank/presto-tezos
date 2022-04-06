@@ -140,10 +140,33 @@ public class TezosClient {
         }
     }
 
+    public Proposal getLastProposal() throws IOException {
+        try {
+            String json = doGetRequest(endpoint+"/tables/proposal?columns="+getProposalColumns()+"&limit=1&order=desc");
+            List<Proposal> resp = new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Proposal.class, new ProposalTableDeserializer()))
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .reader()
+                    .forType(new TypeReference<List<Proposal>>() {
+                    })
+                    .readValue(json);
+            if (resp.size() > 0) {
+                return resp.get(0);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get last proposal");
+        }
+
+    }
+
     public Election getLastElection() throws IOException {
         try {
             String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns()
-                    + "&limit=50000&end_height=0");
+                    + "&limit=1&order=desc");
             List<Election> resp = new ObjectMapper()
                     .registerModule(new SimpleModule()
                             .addDeserializer(Election.class, new ElectionTableDeserializer()))

@@ -90,7 +90,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
                     log.info("Built %d splits", connectorSplits.size());
                     return new FixedSplitSource(connectorSplits);
                 case PROPOSAL:
-                    long lastProposal = 50;
+                    long lastProposal = tezosClient.getLastProposal().getRowId();
                     if (tableLayoutHandle.getRanges().isEmpty()) {
                         connectorSplits = LongStream.range(0, lastProposal + 1)
                                 .mapToObj(TezosSplit::forProposal)
