@@ -170,8 +170,8 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("voting_period", BigintType.BIGINT));
             builder.add(new Pair<>("start_time", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("end_time", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("start_height", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("end_height", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("start_height", BigintType.BIGINT));
+            builder.add(new Pair<>("end_height", BigintType.BIGINT));
             builder.add(new Pair<>("is_empty", BooleanType.BOOLEAN));
             builder.add(new Pair<>("is_open", BooleanType.BOOLEAN));
             builder.add(new Pair<>("is_failed", BooleanType.BOOLEAN));

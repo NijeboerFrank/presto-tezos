@@ -48,19 +48,17 @@ public class TezosRecordSet implements RecordSet {
 
         switch (split.getTable()) {
             case BLOCK:
-                TezosBlockSplit blockSplit = (TezosBlockSplit) split;
                 Block block = null;
                 try {
-                    block = tezosClient.getBlock(blockSplit.getBlockId());
+                    block = tezosClient.getBlock(split.getBlockId());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 return new TezosBlockRecordCursor(columnHandles, block, split.getTable(), tezosClient);
             case ELECTION:
-                TezosElectionSplit electionSplit = (TezosElectionSplit) split;
                 Election election = null;
                 try {
-                    election = tezosClient.getElection(electionSplit.getProposalId());
+                    election = tezosClient.getElection(split.getProposalId());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

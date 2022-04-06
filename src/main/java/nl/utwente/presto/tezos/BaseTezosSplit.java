@@ -13,10 +13,19 @@ import java.util.List;
 public class BaseTezosSplit implements ConnectorSplit {
 
     private final TezosTable table;
+    private final long blockId;
+    private final String blockHash;
+    private final long proposalId;
 
     @JsonCreator
-    public BaseTezosSplit(@JsonProperty("table") TezosTable table) {
+    public BaseTezosSplit(
+            @JsonProperty("table") TezosTable table,
+            @JsonProperty("blockId") long blockId,
+            @JsonProperty("proposalId") long proposalId) {
         this.table = table;
+        this.blockId = blockId;
+        this.proposalId = proposalId;
+        this.blockHash = null;
     }
 
     @JsonProperty
@@ -38,4 +47,20 @@ public class BaseTezosSplit implements ConnectorSplit {
     public Object getInfo() {
         return this;
     }
+
+    @JsonProperty
+    public long getBlockId() {
+        return blockId;
+    }
+
+    @JsonProperty
+    public String getBlockHash() {
+        return blockHash;
+    }
+
+    @JsonProperty
+    public long getProposalId() {
+        return proposalId;
+    }
+
 }

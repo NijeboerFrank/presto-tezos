@@ -41,7 +41,8 @@ public class TezosElectionRecordCursor extends BaseTezosRecordCursor {
 
     @Override
     public long getCompletedBytes() {
-        return election.getElection().getNumProposals();
+        return 0;
+        // return election.getElection().getNumProposals();
     }
 
     @Override
