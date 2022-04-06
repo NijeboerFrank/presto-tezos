@@ -89,9 +89,9 @@ public class TezosClient {
     }
 
 
-    public Election getElection(long proposalId) throws IOException {
+    public Election getElection(long electionId) throws IOException {
         try {
-            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&proposal_id="+proposalId);
+            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&row_id="+electionId);
             List<Election> resp = new ObjectMapper()
                     .registerModule(new SimpleModule()
                             .addDeserializer(Election.class, new ElectionTableDeserializer()))
@@ -106,14 +106,14 @@ public class TezosClient {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get election "+proposalId);
+            throw new IOException("Failed to get election "+electionId);
         }
     }
 
-    public List<Election> getElections(long[] proposalIds) throws IOException {
-        String proposalIdList = Arrays.stream(proposalIds).mapToObj(String::valueOf).collect(Collectors.joining(","));
+    public List<Election> getElections(long[] electionIds) throws IOException {
+        String proposalIdList = Arrays.stream(electionIds).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
-            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&proposal_id.in="+proposalIdList);
+            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&row_id.in="+proposalIdList);
             return new ObjectMapper()
                     .registerModule(new SimpleModule()
                             .addDeserializer(Election.class, new ElectionTableDeserializer()))
@@ -124,23 +124,6 @@ public class TezosClient {
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get elections "+proposalIdList);
-        }
-    }
-
-    public List<Election> getElections(String[] proposals) throws IOException {
-        String electionString = String.join(",", proposals);
-        try {
-            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&proposal.in="+electionString);
-            return new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Election.class, new ElectionTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Election>>() {})
-                    .readValue(json);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Failed to get elections "+electionString);
         }
     }
 
