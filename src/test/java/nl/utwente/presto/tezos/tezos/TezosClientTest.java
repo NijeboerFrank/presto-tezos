@@ -29,15 +29,15 @@ public class TezosClientTest {
     public void testElections() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
         List<Election> elections = tezosClient.getElections(new long[] { 1, 3 });
-        assertTrue(elections.stream().anyMatch(b -> b.getProposalId() == 1));
-        assertTrue(elections.stream().anyMatch(b -> b.getProposalId() == 3));
+        assertTrue(elections.stream().anyMatch(b -> b.getRowId() == 1));
+        assertTrue(elections.stream().anyMatch(b -> b.getRowId() == 3));
     }
 
     @Test
     public void testElection() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
         Election election = tezosClient.getElection(1);
-        assertTrue(election.getProposalId() == 1);
+        assertTrue(election.getRowId() == 1);
     }
 
     @Test
