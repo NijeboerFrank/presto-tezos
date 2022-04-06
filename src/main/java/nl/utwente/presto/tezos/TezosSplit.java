@@ -39,7 +39,7 @@ public class TezosSplit implements ConnectorSplit {
     }
 
     public static TezosSplit forElection(long electionId) {
-        return new TezosSplit(TezosTable.ELECTION, 0, 0, electionId);
+        return new TezosSplit(TezosTable.ELECTION, 0, electionId, 0);
     }
 
     @JsonProperty
