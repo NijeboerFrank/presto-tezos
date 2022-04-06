@@ -14,6 +14,7 @@ public enum TezosUnit {
     TETHER(1E30);
 
     private final double xwei;
+
     TezosUnit(double v) {
         this.xwei = v;
     }

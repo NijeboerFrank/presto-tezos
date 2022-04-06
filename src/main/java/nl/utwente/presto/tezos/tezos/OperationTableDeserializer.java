@@ -12,7 +12,7 @@ import java.util.Iterator;
 
 public class OperationTableDeserializer extends JsonDeserializer<Operation> {
     /**
-     * Deserializer for the operation JSON object.
+     * Deserializer for the operation JSON object from the table API.
      * Returns a new Operation object with the given data.
      */
     @Override

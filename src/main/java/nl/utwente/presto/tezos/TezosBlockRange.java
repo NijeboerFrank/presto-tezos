@@ -41,8 +41,7 @@ public class TezosBlockRange {
     @JsonCreator
     public TezosBlockRange(
             @JsonProperty("startBlock") long startBlock,
-            @JsonProperty("endBlock") long endBlock
-    ) {
+            @JsonProperty("endBlock") long endBlock) {
         this.startBlock = startBlock;
         this.endBlock = endBlock;
     }

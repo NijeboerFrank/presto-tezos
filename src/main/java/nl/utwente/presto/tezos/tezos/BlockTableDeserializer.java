@@ -10,8 +10,14 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class BlockTableDeserializer extends JsonDeserializer<Block> {
+
+    /**
+     * Deserializer for the block JSON object from the table API.
+     * Returns a new Block object with the given data.
+     */
     @Override
-    public Block deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    public Block deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+            throws IOException, JsonProcessingException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         Iterator<JsonNode> iterator = node.elements();
         return new Block(

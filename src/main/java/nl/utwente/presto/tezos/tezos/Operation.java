@@ -10,6 +10,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Represents a Operation data object, which can be transactions, as well as
+ * other types of Tezos operations.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -61,6 +65,11 @@ public class Operation {
     private String block;
     private String entrypoint;
 
+    /**
+     * Returns this Operation object
+     * 
+     * @return this Operation object
+     */
     public Operation getOperation() {
         return this;
     }

@@ -9,6 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TezosClientTest {
+    /**
+     * Requests a block at height one, and checks if the requested Block object's
+     * hash is equal to the hardcoded hash of that block.
+     * 
+     * @throws IOException
+     */
     @Test
     public void testBlock() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
@@ -17,6 +23,12 @@ public class TezosClientTest {
         assertEquals("BLSqrcLvFtqVCx8WSqkVJypW2kAVRM3eEj2BHgBsB6kb24NqYev", block.getHash());
     }
 
+    /**
+     * Requests multiple blocks at height 1 and 2, and checks if the heights of the
+     * returned objects actually are 1 and 2.
+     * 
+     * @throws IOException
+     */
     @Test
     public void testBlocks() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
@@ -25,6 +37,12 @@ public class TezosClientTest {
         assertTrue(block.stream().anyMatch(b -> b.getHeight() == 2));
     }
 
+    /**
+     * Requests multiple operations at height 1 and 2, and checks if the hash is
+     * equal to the hardcoded hash of the first operation.
+     * 
+     * @throws IOException
+     */
     @Test
     public void testOperations() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
