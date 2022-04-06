@@ -21,13 +21,13 @@ import static java.util.Objects.requireNonNull;
 public class TezosRecordSet implements RecordSet {
     private static final Logger log = Logger.get(TezosRecordSet.class);
 
-    private final BaseTezosSplit split;
+    private final TezosSplit split;
     private final TezosClient tezosClient;
 
     private final List<TezosColumnHandle> columnHandles;
     private final List<Type> columnTypes;
 
-    TezosRecordSet(TezosClient tezosClient, List<TezosColumnHandle> columnHandles, BaseTezosSplit split) {
+    TezosRecordSet(TezosClient tezosClient, List<TezosColumnHandle> columnHandles, TezosSplit split) {
         this.split = requireNonNull(split, "split is null");
         this.tezosClient = requireNonNull(tezosClient, "TezosClient is null");
 

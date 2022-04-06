@@ -3,7 +3,7 @@ package nl.utwente.presto.tezos.handle;
 import com.facebook.presto.spi.*;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
 
-import nl.utwente.presto.tezos.BaseTezosSplit;
+import nl.utwente.presto.tezos.TezosSplit;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -21,7 +21,7 @@ public class TezosHandleResolver implements ConnectorHandleResolver {
 
     @Override
     public Class<? extends ConnectorSplit> getSplitClass() {
-        return BaseTezosSplit.class;
+        return TezosSplit.class;
     }
 
     @Override
@@ -47,10 +47,10 @@ public class TezosHandleResolver implements ConnectorHandleResolver {
         return (TezosColumnHandle) columnHandle;
     }
 
-    public static BaseTezosSplit convertSplit(ConnectorSplit split) {
+    public static TezosSplit convertSplit(ConnectorSplit split) {
         requireNonNull(split, "split is null");
-        checkArgument(split instanceof BaseTezosSplit, "split is not an instance of TezosSplit");
-        return (BaseTezosSplit) split;
+        checkArgument(split instanceof TezosSplit, "split is not an instance of TezosSplit");
+        return (TezosSplit) split;
     }
 
     public static TezosTableLayoutHandle convertLayout(ConnectorTableLayoutHandle layout) {
