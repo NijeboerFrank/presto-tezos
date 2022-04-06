@@ -10,18 +10,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
 import java.util.List;
 
-public class TezosElectionSplit implements BaseTezosSplit {
+public class TezosElectionSplit extends BaseTezosSplit {
     private final long proposalId;
-
-    private final TezosTable table;
 
     @JsonCreator
     public TezosElectionSplit(
             @JsonProperty("proposalId") long proposalId,
             @JsonProperty("table") TezosTable table
     ) {
+        super(table);
         this.proposalId = proposalId;
-        this.table = table;
     }
 
     @JsonProperty
@@ -29,23 +27,5 @@ public class TezosElectionSplit implements BaseTezosSplit {
         return proposalId;
     }
 
-    @JsonProperty
-    public TezosTable getTable() {
-        return table;
-    }
 
-    @Override
-    public NodeSelectionStrategy getNodeSelectionStrategy() {
-        return NodeSelectionStrategy.NO_PREFERENCE;
-    }
-
-    @Override
-    public List<HostAddress> getPreferredNodes(NodeProvider nodeProvider) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Object getInfo() {
-        return this;
-    }
 }

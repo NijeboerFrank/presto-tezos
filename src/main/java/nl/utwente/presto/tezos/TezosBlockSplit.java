@@ -10,19 +10,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
 import java.util.List;
 
-public class TezosBlockSplit implements BaseTezosSplit {
+public class TezosBlockSplit extends BaseTezosSplit {
     private final long blockId;
     private final String blockHash;
-
-    private final TezosTable table;
 
     @JsonCreator
     public TezosBlockSplit(
             @JsonProperty("blockId") long blockId,
             @JsonProperty("table") TezosTable table
     ) {
+        super(table);
         this.blockId = blockId;
-        this.table = table;
         this.blockHash = null;
     }
 
@@ -36,23 +34,4 @@ public class TezosBlockSplit implements BaseTezosSplit {
         return blockHash;
     }
 
-    @JsonProperty
-    public TezosTable getTable() {
-        return table;
-    }
-
-    @Override
-    public NodeSelectionStrategy getNodeSelectionStrategy() {
-        return NodeSelectionStrategy.NO_PREFERENCE;
-    }
-
-    @Override
-    public List<HostAddress> getPreferredNodes(NodeProvider nodeProvider) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Object getInfo() {
-        return this;
-    }
 }
