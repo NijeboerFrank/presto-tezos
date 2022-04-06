@@ -36,47 +36,51 @@ public class TezosClient {
 
     public Block getBlock(String hash) throws IOException {
         try {
-            String json = doGetRequest(endpoint+"/explorer/block/"+hash);
+            String json = doGetRequest(endpoint + "/explorer/block/" + hash);
             return new ObjectMapper()
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .readValue(json,  Block.class);
+                    .readValue(json, Block.class);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get block "+hash);
+            throw new IOException("Failed to get block " + hash);
         }
     }
 
     public List<Block> getBlocks(long[] heights) throws IOException {
         String heightsIn = Arrays.stream(heights).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
-            String json = doGetRequest(endpoint+"/tables/block?columns="+getBlocksColumns()+"&limit=50000&height.in="+heightsIn);
+            String json = doGetRequest(
+                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.in=" + heightsIn);
             return new ObjectMapper()
                     .registerModule(new SimpleModule()
                             .addDeserializer(Block.class, new BlockTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
-                    .forType(new TypeReference<List<Block>>() {})
+                    .forType(new TypeReference<List<Block>>() {
+                    })
                     .readValue(json);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get blocks "+heightsIn);
+            throw new IOException("Failed to get blocks " + heightsIn);
         }
     }
 
     public List<Block> getBlocks(String[] hashes) throws IOException {
         String hashesIn = String.join(",", hashes);
         try {
-            String json = doGetRequest(endpoint+"/tables/block?columns="+getBlocksColumns()+"&limit=50000&hash.in="+hashesIn);
+            String json = doGetRequest(
+                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&hash.in=" + hashesIn);
             return new ObjectMapper()
                     .registerModule(new SimpleModule()
                             .addDeserializer(Block.class, new BlockTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
-                    .forType(new TypeReference<List<Block>>() {})
+                    .forType(new TypeReference<List<Block>>() {
+                    })
                     .readValue(json);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get blocks "+hashesIn);
+            throw new IOException("Failed to get blocks " + hashesIn);
         }
     }
 
@@ -88,7 +92,6 @@ public class TezosClient {
         return "row_id,proposal_id,num_periods,num_proposals,voting_period,start_time,end_time,start_height,end_height,is_empty,is_open,is_failed,no_quorum,no_majority,proposal,last_voting_period";
     }
 
-
     public Election getElection(long electionId) throws IOException {
         try {
             String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&row_id="+electionId);
@@ -97,7 +100,8 @@ public class TezosClient {
                             .addDeserializer(Election.class, new ElectionTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
-                    .forType(new TypeReference<List<Election>>() {})
+                    .forType(new TypeReference<List<Election>>() {
+                    })
                     .readValue(json);
             if (resp.size() > 0) {
                 return resp.get(0);
@@ -110,6 +114,29 @@ public class TezosClient {
         }
     }
 
+    public Election getLastElection() throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns()
+                    + "&limit=50000&end_height=0");
+            List<Election> resp = new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Election.class, new ElectionTableDeserializer()))
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .reader()
+                    .forType(new TypeReference<List<Election>>() {
+                    })
+                    .readValue(json);
+            if (resp.size() > 0) {
+                return resp.get(resp.size() - 1);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get election head");
+        }
+    }
+
     public List<Election> getElections(long[] electionIds) throws IOException {
         String proposalIdList = Arrays.stream(electionIds).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
@@ -119,11 +146,12 @@ public class TezosClient {
                             .addDeserializer(Election.class, new ElectionTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
-                    .forType(new TypeReference<List<Election>>() {})
+                    .forType(new TypeReference<List<Election>>() {
+                    })
                     .readValue(json);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get elections "+proposalIdList);
+            throw new IOException("Failed to get elections " + proposalIdList);
         }
     }
 

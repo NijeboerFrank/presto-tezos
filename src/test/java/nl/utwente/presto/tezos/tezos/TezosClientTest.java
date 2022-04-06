@@ -39,4 +39,11 @@ public class TezosClientTest {
         Election election = tezosClient.getElection(1);
         assertTrue(election.getProposalId() == 1);
     }
+
+    @Test
+    public void testLastElection() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Election election = tezosClient.getLastElection();
+        assertTrue(election.getRowId() > 30);
+    }
 }
