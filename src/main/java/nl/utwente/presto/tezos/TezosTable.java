@@ -6,6 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TezosTable {
     BLOCK("block"),
+    ELECTION("election"),
     CONTRACT("contract");
 
     @Getter

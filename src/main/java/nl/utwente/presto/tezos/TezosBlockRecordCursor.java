@@ -13,18 +13,16 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
-public class TezosRecordCursor extends BaseTezosRecordCursor {
-    private static final Logger log = Logger.get(TezosRecordCursor.class);
+public class TezosBlockRecordCursor extends BaseTezosRecordCursor {
+    private static final Logger log = Logger.get(TezosBlockRecordCursor.class);
 
     private final Block block;
     private final Iterator<Block> blockIter;
-//    private final Contract contract;
-//    private final Iterator<Contract> contractIter;
-
 
     private final TezosTable table;
 
-    public TezosRecordCursor(List<TezosColumnHandle> columnHandles, Block block, TezosTable table, TezosClient tezosClient) {
+    public TezosBlockRecordCursor(List<TezosColumnHandle> columnHandles, Block block, TezosTable table,
+            TezosClient tezosClient) {
         super(columnHandles);
 
         this.table = table;
@@ -81,9 +79,6 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             builder.add(block::getNEvents);
             builder.add(block::isLbEscVote);
             builder.add(block::getLbEscEma);
-
-//        } else if (table == TezosTable.BLOCK) {
-//            builder.add(contract::)
         } else {
             return false;
         }
