@@ -24,4 +24,12 @@ public class TezosClientTest {
         assertTrue(block.stream().anyMatch(b -> b.getHeight() == 1));
         assertTrue(block.stream().anyMatch(b -> b.getHeight() == 2));
     }
+
+    @Test
+    public void testOperations() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        List<Operation> operations = tezosClient.getOperations(new long[] { 1, 2 });
+        assertTrue(operations.stream()
+                .anyMatch(b -> b.getHash().equals("oneDGhZacw99EEFaYDTtWfz5QEhUW3PPVFsHa7GShnLPuDn7gSd")));
+    }
 }

@@ -180,12 +180,44 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_lbEscEma", BigintType.BIGINT));
         } else if (TezosTable.OPERATION.getName().equals(table)) {
             builder.add(new Pair<>("operation_id", BigintType.BIGINT));
-            builder.add(new Pair<>("operation_hash", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("operation_type", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("operation_block", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_hash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_height", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_cycle", BigintType.BIGINT));
             builder.add(new Pair<>("operation_time", TimestampType.TIMESTAMP));
-            // TODO include more fields from
-            // https://tzstats.com/docs/api/index.html?shell#operations
+            builder.add(new Pair<>("operation_opN", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_opP", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_status", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_isSuccess", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("operation_isContract", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("operation_isEvent", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("operation_isInternal", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("operation_counter", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_gasLimit", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_gasUsed", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_storageLimit", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_storagePaid", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_volume", DoubleType.DOUBLE));
+            builder.add(new Pair<>("operation_fee", DoubleType.DOUBLE));
+            builder.add(new Pair<>("operation_reward", DoubleType.DOUBLE));
+            builder.add(new Pair<>("operation_deposit", DoubleType.DOUBLE));
+            builder.add(new Pair<>("operation_burned", DoubleType.DOUBLE));
+            builder.add(new Pair<>("operation_senderId", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_receiverId", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_managerId", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_bakerId", BigintType.BIGINT));
+            builder.add(new Pair<>("operation_data", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_parameters", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_storage", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_bigMapDiff", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_errors", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_daysDestroyed", DoubleType.DOUBLE));
+            builder.add(new Pair<>("operation_sender", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_receiver", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_creator", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_baker", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_block", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("operation_entrypoint", VarcharType.createUnboundedVarcharType()));
         } else {
             throw new IllegalArgumentException("Unknown Table Name " + table);
         }
