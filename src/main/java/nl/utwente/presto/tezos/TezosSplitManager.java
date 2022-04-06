@@ -34,6 +34,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
 
     /**
      * Convert list of block ranges to a list of splits
+     *
      * @param transaction
      * @param session
      * @param layout table layout and block ranges

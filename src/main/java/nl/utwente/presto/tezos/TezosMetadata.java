@@ -66,6 +66,8 @@ public class TezosMetadata extends BaseTezosMetadata {
                 List<Range> orderedRanges = entry.getValue().getValues().getRanges().getOrderedRanges();
 
                 switch (columnName) {
+                    case "contract_address":
+                        break;
                     case "block_height":
                         // Limit query to block number range
                         orderedRanges.forEach(r -> {
@@ -187,6 +189,19 @@ public class TezosMetadata extends BaseTezosMetadata {
 
         return builder.build();
     }
+
+    /**
+     * Gives the names of the different tables
+     * @param session
+     * @param schamaNameOrNull
+     * @return List of tables available
+     */
+    @Override
+    public List<SchemaTableName> listTables(ConnectorSession session, String schamaNameOrNull) {
+        return ImmutableList.of(new SchemaTableName(DEFAULT_SCHEMA, TezosTable.BLOCK.getName()),
+                new SchemaTableName(DEFAULT_SCHEMA, TezosTable.CONTRACT.getName()));
+    }
+
 
     /**
      * Get the ID of a block that was added at a given timestamp
