@@ -78,7 +78,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                                 .filter(Range::isSingleValue).forEach(r -> {
                                     String blockHash = ((Slice) r.getSingleValue()).toStringUtf8();
                                     try {
-                                        long blockNumber = tezosClient.getBlock(blockHash).getNumber().longValue();
+                                        long blockNumber = tezosClient.getBlock(blockHash).getHeight().longValue();
                                         builder.add(new TezosRange(columnName, blockNumber, blockNumber));
                                     } catch (IOException e) {
                                         throw new IllegalStateException("Unable to getting block by hash " + blockHash);

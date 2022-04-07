@@ -28,7 +28,7 @@ public class TezosBlockRecordCursor extends BaseTezosRecordCursor {
 
     @Override
     public long getCompletedBytes() {
-        return blocks.stream().mapToLong(block -> block.getBlock().getSize().longValue()).sum();
+        return blocks.stream().mapToLong(block -> block.getSize().longValue()).sum();
     }
 
     @Override

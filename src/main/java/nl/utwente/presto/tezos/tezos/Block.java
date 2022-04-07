@@ -59,16 +59,8 @@ public class Block {
     private boolean lbEscVote;
     private long lbEscEma;
 
-    public Block getBlock() {
-        return this;
-    }
-
-    public Number getSize() { // TODO check if this is what they want from getSize
+    public Number getSize() {
         return this.storagePaid;
-    }
-
-    public Number getNumber() {
-        return this.height;
     }
 
     public Number getTimestamp() {
