@@ -1,15 +1,10 @@
 package nl.utwente.presto.tezos.recordCursor;
 
 import com.google.common.collect.ImmutableList;
-import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.TezosTable;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
-import nl.utwente.presto.tezos.recordCursor.BaseTezosRecordCursor;
 import nl.utwente.presto.tezos.tezos.Contract;
-import nl.utwente.presto.tezos.tezos.Election;
-import nl.utwente.presto.tezos.tezos.TezosClient;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -39,7 +34,7 @@ public class TezosContractRecordCursor extends BaseTezosRecordCursor {
 
     @Override
     public boolean advanceNextPosition() {
-        if (table != TezosTable.CONTRACT && !contractIter.hasNext()) {
+        if (table != TezosTable.CONTRACT || !contractIter.hasNext()) {
             return false;
         }
 
