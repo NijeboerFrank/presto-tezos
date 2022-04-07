@@ -86,4 +86,13 @@ public class TezosClientTest {
         Proposal proposal = tezosClient.getProposal(1);
         assertTrue(proposal.getRowId() == 1);
     }
+
+    @Test
+    public void testProposals() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        List<Proposal> proposals = tezosClient.getProposals(1, 3);
+        assertTrue(proposals.stream().anyMatch(b -> b.getRowId() == 1));
+        assertTrue(proposals.stream().anyMatch(b -> b.getRowId() == 3));
+    }
+
 }

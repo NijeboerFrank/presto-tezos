@@ -3,6 +3,8 @@ package nl.utwente.presto.tezos;
 import com.facebook.presto.common.type.Type;
 import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
+import com.google.common.collect.ImmutableList;
+
 import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.recordCursor.TezosBlockRecordCursor;
@@ -23,7 +25,6 @@ import static java.util.Objects.requireNonNull;
 
 public class TezosRecordSet implements RecordSet {
     private static final Logger log = Logger.get(TezosRecordSet.class);
-
     private final TezosSplit split;
     private final TezosClient tezosClient;
 
@@ -49,40 +50,71 @@ public class TezosRecordSet implements RecordSet {
     @Override
     public RecordCursor cursor() {
 
+        log.info("CURSOR");
+        log.info("%s", split.getTable());
+
         switch (split.getTable()) {
             case BLOCK:
-                Block block = null;
+                List<Block> blocks = null;
                 try {
-                    block = tezosClient.getBlock(split.getBlockId());
+                    switch (split.getType()) {
+                        case BLOCK:
+                            blocks = ImmutableList.of(tezosClient.getBlock(split.getBlockId()));
+                            break;
+                        case BLOCK_RANGE:
+                            blocks = tezosClient.getBlocks(split.getBlockStartId(), split.getBlockEndId());
+                            break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return new TezosBlockRecordCursor(columnHandles, block, split.getTable(), tezosClient);
+                return new TezosBlockRecordCursor(columnHandles, blocks, split.getTable());
             case ELECTION:
-                Election election = null;
+                List<Election> elections = null;
                 try {
-                    // TODO Also get election by proposal ID
-                    election = tezosClient.getElection(split.getElectionId());
+                    switch (split.getType()) {
+                        case ELECTION:
+                            elections = ImmutableList.of(tezosClient.getElection(split.getElectionId()));
+                            break;
+                        case ELECTION_RANGE:
+                            elections = tezosClient.getElections(split.getElectionStartId(), split.getElectionEndId());
+                            break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return new TezosElectionRecordCursor(columnHandles, election, split.getTable(), tezosClient);
+                return new TezosElectionRecordCursor(columnHandles, elections, split.getTable());
             case PROPOSAL:
-                Proposal proposal = null;
+                List<Proposal> proposals = null;
                 try {
-                    proposal = tezosClient.getProposal(split.getProposalId());
+                    switch (split.getType()) {
+                        case PROPOSAL:
+                            proposals = ImmutableList.of(tezosClient.getProposal(split.getProposalId()));
+                            break;
+                        case PROPOSAL_RANGE:
+                            proposals = tezosClient.getProposals(split.getProposalStartId(), split.getProposalEndId());
+                            break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return new TezosProposalRecordCursor(columnHandles, proposal, split.getTable(), tezosClient);
+                return new TezosProposalRecordCursor(columnHandles, proposals, split.getTable());
             case OPERATION:
-                Operation operation = null;
+                List<Operation> operations = null;
                 try {
-                    operation = tezosClient.getOperation(split.getOperationId());
+                    log.info("%s", split.getType());
+                    switch (split.getType()) {
+                        case OPERATION:
+                            operations = ImmutableList.of(tezosClient.getOperation(split.getOperationId()));
+                            break;
+                        case OPERATION_RANGE:
+                            operations = tezosClient.getOperations(split.getOperationStartId(), split.getOperationEndId());
+                            break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return new TezosOperationRecordCursor(columnHandles, operation, split.getTable(), tezosClient);
+                return new TezosOperationRecordCursor(columnHandles, operations, split.getTable());
             default:
                 return null;
         }

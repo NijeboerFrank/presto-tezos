@@ -13,7 +13,7 @@ public class TezosRange {
         long start;
         long end;
         if (low.isLowerUnbounded()) {
-            start = 1L;
+            start = 0L;
         } else if (low.getBound() == Marker.Bound.EXACTLY) {
             start = (long) low.getValue();
         } else if (low.getBound() == Marker.Bound.ABOVE) {

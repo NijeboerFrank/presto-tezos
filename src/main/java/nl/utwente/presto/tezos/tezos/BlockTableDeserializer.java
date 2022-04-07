@@ -1,13 +1,16 @@
 package nl.utwente.presto.tezos.tezos;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.TimeZone;
 
 public class BlockTableDeserializer extends JsonDeserializer<Block> {
 
@@ -16,10 +19,13 @@ public class BlockTableDeserializer extends JsonDeserializer<Block> {
      * Returns a new Block object with the given data.
      */
     @Override
-    public Block deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-            throws IOException, JsonProcessingException {
+    public Block deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         Iterator<JsonNode> iterator = node.elements();
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+
         return new Block(
                 iterator.next().asText(), // hash
                 iterator.next().asText(), // predecessor
@@ -27,7 +33,7 @@ public class BlockTableDeserializer extends JsonDeserializer<Block> {
                 iterator.next().asLong(), // height
                 iterator.next().asLong(), // cycle
                 iterator.next().asBoolean(), // is_cycle_snapshot
-                iterator.next().asText(), // time
+                df.format(new Date(iterator.next().asLong())), // time
                 iterator.next().asLong(), // solvetime
                 iterator.next().asLong(), // version
                 iterator.next().asLong(), // round

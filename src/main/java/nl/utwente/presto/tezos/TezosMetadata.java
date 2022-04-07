@@ -24,11 +24,6 @@ import static java.util.Objects.requireNonNull;
 import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertTableHandle;
 
 public class TezosMetadata extends BaseTezosMetadata {
-    public static final int H8_BYTE_HASH_STRING_LENGTH = 2 + 8 * 2;
-    public static final int H32_BYTE_HASH_STRING_LENGTH = 2 + 32 * 2;
-    public static final int H256_BYTE_HASH_STRING_LENGTH = 2 + 256 * 2;
-    public static final int H20_BYTE_HASH_STRING_LENGTH = 2 + 20 * 2;
-
     private final TezosClient tezosClient;
 
     @Inject
@@ -68,7 +63,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                     case "block_height":
                     case "election_id":
                     case "proposal_id":
-                    case "operation_id":
+                    case "operation_height":
                         // Limit query to block number range
                         orderedRanges.forEach(r -> {
                             Marker low = r.getLow();

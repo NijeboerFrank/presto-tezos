@@ -99,6 +99,24 @@ public class TezosClient {
     }
 
     /**
+     * Retrieve blocks in a range
+     * @param start lower bound block height (ID)
+     * @param end upper bound block height (ID)
+     * @return blocks
+     * @throws IOException if blocks failed to retrieve
+     */
+    public List<Block> getBlocks(long start, long end) throws IOException {
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.gte=" + start + "&height.lte=" + end);
+            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {}, new BlockTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get blocks between " + start + " and " + end);
+        }
+    }
+
+    /**
      * Get the block that was added last
      * 
      * @return last block
@@ -136,6 +154,24 @@ public class TezosClient {
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get operation " + operationId);
+        }
+    }
+
+    /**
+     * Retrieve operations in a range
+     * @param start lower bound operation ID
+     * @param end upper bound operation ID
+     * @return operations
+     * @throws IOException if operations failed to retrieve
+     */
+    public List<Operation> getOperations(long start, long end) throws IOException {
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/op?columns=" + getOperationsColumns() + "&limit=50000&height.gte=" + start + "&height.lte=" + end);
+            return convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {}, new OperationTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get proposals between " + start + " and " + end);
         }
     }
 
@@ -265,6 +301,24 @@ public class TezosClient {
     }
 
     /**
+     * Retrieve elections in a range
+     * @param start lower bound election ID
+     * @param end upper bound election ID
+     * @return elections
+     * @throws IOException if elections failed to retrieve
+     */
+    public List<Election> getElections(long start, long end) throws IOException {
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id.gte=" + start + "&row_id.lte=" + end);
+            return convertJsonList(json, Election.class, new TypeReference<List<Election>>() {}, new ElectionTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get elections between " + start + " and " + end);
+        }
+    }
+
+    /**
      * Get the most recent election
      * 
      * @return last election
@@ -313,6 +367,24 @@ public class TezosClient {
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get proposal " + proposalId);
+        }
+    }
+
+    /**
+     * Retrieve proposals in a range
+     * @param start lower bound proposal ID
+     * @param end upper bound proposal ID
+     * @return proposals
+     * @throws IOException if proposals failed to retrieve
+     */
+    public List<Proposal> getProposals(long start, long end) throws IOException {
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/proposal?columns=" + getProposalColumns() + "&limit=50000&row_id.gte=" + start + "&row_id.lte=" + end);
+            return convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {}, new ProposalTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get proposals between " + start + " and " + end);
         }
     }
 

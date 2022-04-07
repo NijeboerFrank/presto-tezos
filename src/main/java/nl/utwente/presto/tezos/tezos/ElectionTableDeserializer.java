@@ -1,7 +1,6 @@
 package nl.utwente.presto.tezos.tezos;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,7 +10,7 @@ import java.util.Iterator;
 
 public class ElectionTableDeserializer extends JsonDeserializer<Election> {
     @Override
-    public Election deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    public Election deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         Iterator<JsonNode> iterator = node.elements();
         return new Election(
