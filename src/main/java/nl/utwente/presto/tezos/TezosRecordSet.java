@@ -65,10 +65,10 @@ public class TezosRecordSet implements RecordSet {
                 List<Election> elections = null;
                 try {
                     switch (split.getType()) {
-                        case BLOCK:
-                            elections = ImmutableList.of(tezosClient.getElection(split.getBlockId()));
+                        case ELECTION:
+                            elections = ImmutableList.of(tezosClient.getElection(split.getElectionId()));
                             break;
-                        case BLOCK_RANGE:
+                        case ELECTION_RANGE:
                             elections = tezosClient.getElections(split.getElectionStartId(), split.getElectionEndId());
                             break;
                     }
@@ -80,10 +80,10 @@ public class TezosRecordSet implements RecordSet {
                 List<Proposal> proposals = null;
                 try {
                     switch (split.getType()) {
-                        case BLOCK:
-                            proposals = ImmutableList.of(tezosClient.getProposal(split.getBlockId()));
+                        case PROPOSAL:
+                            proposals = ImmutableList.of(tezosClient.getProposal(split.getProposalId()));
                             break;
-                        case BLOCK_RANGE:
+                        case PROPOSAL_RANGE:
                             proposals = tezosClient.getProposals(split.getProposalStartId(), split.getProposalEndId());
                             break;
                     }

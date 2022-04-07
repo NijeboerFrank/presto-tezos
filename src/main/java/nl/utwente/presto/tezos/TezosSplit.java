@@ -54,22 +54,22 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Create new splits for a range of elections
-     * @param blockIdStart lower bound election ID
-     * @param blockIdEnd upper bound election ID
+     * @param electionIdStart lower bound election ID
+     * @param electionIdEnd upper bound election ID
      * @return new splits
      */
-    public static List<ConnectorSplit> forElectionRange(long blockIdStart, long blockIdEnd) {
-        return forRange(blockIdStart, blockIdEnd, TezosTable.BLOCK, Type.ELECTION_RANGE);
+    public static List<ConnectorSplit> forElectionRange(long electionIdStart, long electionIdEnd) {
+        return forRange(electionIdStart, electionIdEnd, TezosTable.ELECTION, Type.ELECTION_RANGE);
     }
 
     /**
      * Create new splits for a range of proposals
-     * @param blockIdStart lower bound proposal ID
-     * @param blockIdEnd upper bound proposal ID
+     * @param proposalIdStart lower bound proposal ID
+     * @param proposalIdEnd upper bound proposal ID
      * @return new splits
      */
-    public static List<ConnectorSplit> forProposalRange(long blockIdStart, long blockIdEnd) {
-        return forRange(blockIdStart, blockIdEnd, TezosTable.BLOCK, Type.PROPOSAL_RANGE);
+    public static List<ConnectorSplit> forProposalRange(long proposalIdStart, long proposalIdEnd) {
+        return forRange(proposalIdStart, proposalIdEnd, TezosTable.PROPOSAL, Type.PROPOSAL_RANGE);
     }
 
     /**
@@ -190,7 +190,7 @@ public class TezosSplit implements ConnectorSplit {
      * @return proposal ID
      */
     public long getProposalStartId() {
-        if (type != Type.BLOCK_RANGE) throw new IllegalArgumentException();
+        if (type != Type.PROPOSAL_RANGE) throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(0).toString());
     }
 
@@ -199,7 +199,7 @@ public class TezosSplit implements ConnectorSplit {
      * @return proposal ID
      */
     public long getProposalEndId() {
-        if (type != Type.BLOCK_RANGE) throw new IllegalArgumentException();
+        if (type != Type.PROPOSAL_RANGE) throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(1).toString());
     }
 

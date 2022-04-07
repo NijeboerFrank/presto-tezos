@@ -78,9 +78,9 @@ public class TezosSplitManager implements ConnectorSplitManager {
             } else {
                 connectorSplits = tableLayoutHandle.getRanges()
                         .stream()
-                        .flatMap(blockRange -> converter.apply(
-                                blockRange.getStart(),
-                                blockRange.getEnd() == -1 ? lastId : blockRange.getEnd() + 1).stream()
+                        .flatMap(range -> converter.apply(
+                                range.getStart(),
+                                range.getEnd() == -1 ? lastId : range.getEnd() + 1).stream()
                         )
                         .collect(Collectors.toList());
             }
