@@ -14,20 +14,20 @@ import java.time.Instant;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Contract {
-    private long row_id;
+    private long rowId;
     private String address;
-    private long account_id;
-    private long creator_id;
-    private long first_seen;
-    private long last_seen;
-    private long storage_size;
-    private long storage_paid;
+    private long accountId;
+    private long creatorId;
+    private long firstSeen;
+    private long lastSeen;
+    private long storageSize;
+    private long storagePaid;
     private String script;
     private String storage;
-    private String iface_hash;
-    private String code_hash;
-    private String storage_hash;
-    private String call_stats;
+    private String ifaceHash;
+    private String codeHash;
+    private String storageHash;
+    private String callStats;
     private String features;
     private String interfaces;
     private String creator;

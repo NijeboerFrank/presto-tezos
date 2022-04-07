@@ -27,7 +27,7 @@ public class TezosClientTest {
     public void testContract() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
         Contract contract = tezosClient.getContract("KT1Puc9St8wdNoGtLiD2WXaHbWU7styaxYhD");
-        assertEquals(818425L, contract.getAccount_id());
+        assertEquals(818425L, contract.getAccountId());
     }
 
     @Test
@@ -56,5 +56,12 @@ public class TezosClientTest {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
         Election election = tezosClient.getLastElection();
         assertTrue(election.getRowId() > 37);
+    }
+
+    @Test
+    public void testProposal() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Proposal proposal = tezosClient.getProposal(1);
+        assertTrue(proposal.getRowId() == 1);
     }
 }

@@ -1,4 +1,4 @@
-package nl.utwente.presto.tezos;
+package nl.utwente.presto.tezos.recordCursor;
 
 import com.facebook.presto.common.block.Block;
 import com.facebook.presto.common.block.BlockBuilder;
@@ -139,8 +139,7 @@ public abstract class BaseTezosRecordCursor implements RecordCursor {
             builder.closeEntry();
             return null;
         } else {
-            Block resultBlock = currentBuilder.build();
-            return resultBlock;
+            return currentBuilder.build();
         }
     }
 
@@ -250,9 +249,8 @@ public abstract class BaseTezosRecordCursor implements RecordCursor {
         if (value instanceof Timestamp) {
             long parsedJvmMillis = ((Timestamp) value).getTime();
             DateTimeZone jvmTimeZone = DateTimeZone.getDefault();
-            long convertedMillis = jvmTimeZone.convertUTCToLocal(parsedJvmMillis);
 
-            return convertedMillis;
+            return jvmTimeZone.convertUTCToLocal(parsedJvmMillis);
         }
         if (value instanceof Float) {
             return floatToRawIntBits(((Float) value));

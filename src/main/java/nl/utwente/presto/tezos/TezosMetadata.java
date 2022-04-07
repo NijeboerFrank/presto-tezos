@@ -24,17 +24,11 @@ import static java.util.Objects.requireNonNull;
 import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertTableHandle;
 
 public class TezosMetadata extends BaseTezosMetadata {
-    public static final int H8_BYTE_HASH_STRING_LENGTH = 2 + 8 * 2;
-    public static final int H32_BYTE_HASH_STRING_LENGTH = 2 + 32 * 2;
-    public static final int H256_BYTE_HASH_STRING_LENGTH = 2 + 256 * 2;
-    public static final int H20_BYTE_HASH_STRING_LENGTH = 2 + 20 * 2;
-
     private final TezosClient tezosClient;
 
     @Inject
     public TezosMetadata(
-            TezosClientProvider provider
-    ) {
+            TezosClientProvider provider) {
         this.tezosClient = requireNonNull(provider, "provider is null").getTezosClient();
     }
 
@@ -69,7 +63,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                     case "contract_id":
                     case "block_height":
                     case "election_id":
-                        // TODO Filter on proposal ID
+                    case "proposal_id":
                         // Limit query to block number range
                         orderedRanges.forEach(r -> {
                             Marker low = r.getLow();
@@ -180,7 +174,7 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("election_proposal", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("election_lastVotingPeriod", VarcharType.createUnboundedVarcharType()));
         } else if (TezosTable.CONTRACT.getName().equals(table)) {
-            builder.add(new Pair<>("contract_contract_id", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_id", BigintType.BIGINT));
             builder.add(new Pair<>("contract_address", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("contract_account_Id", BigintType.BIGINT));
             builder.add(new Pair<>("contract_creator_Id", BigintType.BIGINT));
@@ -197,7 +191,22 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("contract_features", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("contract_interfaces", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("contract_creator", VarcharType.createUnboundedVarcharType()));
-        } else {
+        } else if (TezosTable.PROPOSAL.getName().equals(table)) {
+            builder.add(new Pair<>("proposal_id", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_hash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_height", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_time", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_sourceId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_opId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_electionId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_votingPeriod", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_rolls", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_voters", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_source", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_op", VarcharType.createUnboundedVarcharType()));
+        }
+
+        else {
             throw new IllegalArgumentException("Unknown Table Name " + table);
         }
 
@@ -206,6 +215,7 @@ public class TezosMetadata extends BaseTezosMetadata {
 
     /**
      * Gives the names of the different tables
+     * 
      * @param session
      * @param schamaNameOrNull
      * @return List of tables available
@@ -215,7 +225,6 @@ public class TezosMetadata extends BaseTezosMetadata {
         return ImmutableList.of(new SchemaTableName(DEFAULT_SCHEMA, TezosTable.BLOCK.getName()),
                 new SchemaTableName(DEFAULT_SCHEMA, TezosTable.CONTRACT.getName()));
     }
-
 
     /**
      * Get the ID of a block that was added at a given timestamp
@@ -228,7 +237,7 @@ public class TezosMetadata extends BaseTezosMetadata {
         long startBlock = 1L;
         long currentBlock = 0;
         try {
-            currentBlock = tezosClient.getLastBlockNumber();
+            currentBlock = tezosClient.getLastBlock().getHeight();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -147,7 +147,6 @@ public abstract class BaseTezosMetadata implements ConnectorMetadata {
      * @param tableHandle table to get columns of
      * @return list of columns
      */
-    @SuppressWarnings("ValueOfIncrementOrDecrementUsed")
     @Override
     public Map<String, ColumnHandle> getColumnHandles(ConnectorSession session, ConnectorTableHandle tableHandle) {
         AtomicInteger index = new AtomicInteger();

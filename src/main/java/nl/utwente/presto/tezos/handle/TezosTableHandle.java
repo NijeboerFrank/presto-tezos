@@ -9,11 +9,11 @@ import lombok.ToString;
 
 import static java.util.Objects.requireNonNull;
 
-@EqualsAndHashCode
-@ToString
 /**
  * Stores information on the table
  */
+@EqualsAndHashCode
+@ToString
 public final class TezosTableHandle implements ConnectorTableHandle {
     private final String schemaName;
 
