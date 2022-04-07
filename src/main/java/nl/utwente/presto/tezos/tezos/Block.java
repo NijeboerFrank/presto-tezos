@@ -9,6 +9,9 @@ import lombok.Setter;
 
 import java.time.Instant;
 
+/**
+ * Represents a Block data object
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -59,22 +62,47 @@ public class Block {
     private boolean lbEscVote;
     private long lbEscEma;
 
+    /**
+     * Returns this Block object
+     * 
+     * @return this Block object
+     */
     public Block getBlock() {
         return this;
     }
 
+    /**
+     * Returns the storageSize of this block
+     * 
+     * @return the storageSize of this block
+     */
     public Number getSize() { // TODO check if this is what they want from getSize
         return this.storagePaid;
     }
 
+    /**
+     * Returns the height of the current block
+     * 
+     * @return the height of the current block
+     */
     public Number getNumber() {
         return this.height;
     }
 
+    /**
+     * Returns the timestamp of the current block as epochs econds
+     * 
+     * @return the timestamp of the current block as epochs econd
+     */
     public Number getTimestamp() {
         return Instant.parse(this.time).getEpochSecond();
     }
 
+    /**
+     * The timestamp of the current block as epoch second milliseconds
+     * 
+     * @return the timestamp of the current block as epoch milliseconds
+     */
     public Number getTimestampMillis() {
         return Instant.parse(this.time).getEpochSecond() * 1000;
     }

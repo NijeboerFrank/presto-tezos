@@ -21,6 +21,7 @@ public class TezosClient {
 
     /**
      * Create a new Tezos client
+     * 
      * @param endpoint endpoint to retrieve the data from
      */
     public TezosClient(String endpoint) {
@@ -29,6 +30,7 @@ public class TezosClient {
 
     /**
      * Get block by its height (ID)
+     * 
      * @param height height of block to retrieve
      * @return block
      * @throws IOException if block failed to retrieve
@@ -39,6 +41,7 @@ public class TezosClient {
 
     /**
      * Get block by its hash
+     * 
      * @param hash hash of block to retrieve
      * @return block
      * @throws IOException if block failed to retrieve
@@ -57,6 +60,7 @@ public class TezosClient {
 
     /**
      * Get blocks by heights (IDs)
+     * 
      * @param heights heights (IDs) of blocks to retrieve
      * @return blocks
      * @throws IOException if blocks failed to retrieve
@@ -64,8 +68,10 @@ public class TezosClient {
     public List<Block> getBlocks(long[] heights) throws IOException {
         String heightsIn = Arrays.stream(heights).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
-            String json = doGetRequest(endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.in=" + heightsIn);
-            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {}, new BlockTableDeserializer());
+            String json = doGetRequest(
+                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.in=" + heightsIn);
+            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {
+            }, new BlockTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get blocks " + heightsIn);
@@ -74,6 +80,7 @@ public class TezosClient {
 
     /**
      * Get blocks by hashes
+     * 
      * @param hashes hashes of blocks to retrieve
      * @return blocks
      * @throws IOException if blocks failed to retrieve
@@ -81,8 +88,10 @@ public class TezosClient {
     public List<Block> getBlocks(String[] hashes) throws IOException {
         String hashesIn = String.join(",", hashes);
         try {
-            String json = doGetRequest(endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&hash.in=" + hashesIn);
-            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {}, new BlockTableDeserializer());
+            String json = doGetRequest(
+                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&hash.in=" + hashesIn);
+            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {
+            }, new BlockTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get blocks " + hashesIn);
@@ -109,6 +118,7 @@ public class TezosClient {
 
     /**
      * Get the block that was added last
+     * 
      * @return last block
      * @throws IOException if block failed to retrieve
      */
@@ -118,6 +128,7 @@ public class TezosClient {
 
     /**
      * Columns of the block table to retrieve from the API
+     * 
      * @return table columns
      */
     private String getBlocksColumns() {
@@ -125,16 +136,129 @@ public class TezosClient {
     }
 
     /**
+     * Get operation by its ID
+     * 
+     * @param operationId ID of operation to retrieve
+     * @return operation
+     * @throws IOException if operation failed to retrieve
+     */
+    public Operation getOperation(long operationId) throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/op?columns=" + getOperationsColumns()
+                    + "&limit=50000&id=" + operationId);
+            List<Operation> operations = convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {
+            }, new OperationTableDeserializer());
+            if (operations.isEmpty())
+                throw new IOException("Failed to get operation" + operationId);
+            return operations.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get operation " + operationId);
+        }
+    }
+
+    /**
+     * Retrieve operations in a range
+     * @param start lower bound operation ID
+     * @param end upper bound operation ID
+     * @return operations
+     * @throws IOException if operations failed to retrieve
+     */
+    public List<Operation> getOperations(long start, long end) throws IOException {
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/op?columns=" + getOperationsColumns() + "&limit=50000&height.gte=" + start + "&height.lte=" + end);
+            return convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {}, new OperationTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get proposals between " + start + " and " + end);
+        }
+    }
+
+    /**
+     * Retrieves operations with the given heights from the API
+     * 
+     * @param heights list of heights of requested operations
+     * @return a list of Operations with the given heights
+     * @throws IOException
+     */
+    public List<Operation> getOperations(long[] heights) throws IOException {
+        String heightsIn = Arrays.stream(heights).mapToObj(String::valueOf).collect(Collectors.joining(","));
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/op?columns=" + getOperationsColumns() + "&limit=50000&height.in=" + heightsIn);
+            return convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {}, new OperationTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get operations " + heightsIn);
+        }
+    }
+
+    /**
+     * Retrieves operations with the given hashes from the API
+     * 
+     * @param hashes list of hashes of requested operations
+     * @return a list of Operations with the given hashes
+     * @throws IOException
+     */
+    public List<Operation> getOperations(String[] hashes) throws IOException {
+        String hashesIn = String.join(",", hashes);
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/op?columns=" + getOperationsColumns() + "&limit=50000&hash.in=" + hashesIn);
+            return convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {}, new OperationTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get blocks " + hashesIn);
+        }
+    }
+
+    /**
+     * Get the most recent operation
+     * 
+     * @return last operation
+     * @throws IOException if operation failed to retrieve
+     */
+    public Operation getLastOperation() throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/op?columns=" + getOperationsColumns()
+                    + "&limit=1&order=desc");
+            List<Operation> operations = convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {
+            }, new OperationTableDeserializer());
+            if (operations.isEmpty())
+                throw new IOException("Failed to get last operation");
+            return operations.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get last operation");
+        }
+    }
+
+    /**
+     *
+     * Hardcoded list of columns to be returned for the operations table API
+     * 
+     * @return string of columns names for the operations table API
+     */
+    private String getOperationsColumns() {
+        return "id,type,hash,height,cycle,time,op_n,op_p,status,is_success,is_contract,is_internal,is_event,counter,gas_limit,gas_used,storage_limit,storage_paid,volume,fee,reward,deposit,burned,sender_id,receiver_id,creator_id,baker_id,data,parameters,storage,big_map_diff,errors,days_destroyed,sender,receiver,creator,baker,block,entrypoint";
+    }
+
+    /**
      * Get election by its ID
+     * 
      * @param electionId ID of election to retrieve
      * @return election
      * @throws IOException if election failed to retrieve
      */
     public Election getElection(long electionId) throws IOException {
         try {
-            String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id=" + electionId);
-            List<Election> election = convertJsonList(json, Election.class, new TypeReference<List<Election>>() {}, new ElectionTableDeserializer());
-            if (election.isEmpty()) throw new IOException("Failed to get election " + electionId);
+            String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns()
+                    + "&limit=50000&row_id=" + electionId);
+            List<Election> election = convertJsonList(json, Election.class, new TypeReference<List<Election>>() {
+            }, new ElectionTableDeserializer());
+            if (election.isEmpty())
+                throw new IOException("Failed to get election " + electionId);
             return election.get(0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -144,6 +268,7 @@ public class TezosClient {
 
     /**
      * Get elections by their ID
+     * 
      * @param electionIds IDs of elections to retrieve
      * @return elections
      * @throws IOException if elections failed to retrieve
@@ -151,8 +276,10 @@ public class TezosClient {
     public List<Election> getElections(long[] electionIds) throws IOException {
         String proposalIdList = Arrays.stream(electionIds).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
-            String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id.in=" + proposalIdList);
-            return convertJsonList(json, Election.class, new TypeReference<List<Election>>() {}, new ElectionTableDeserializer());
+            String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns()
+                    + "&limit=50000&row_id.in=" + proposalIdList);
+            return convertJsonList(json, Election.class, new TypeReference<List<Election>>() {
+            }, new ElectionTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get elections " + proposalIdList);
@@ -179,6 +306,7 @@ public class TezosClient {
 
     /**
      * Get the most recent election
+     * 
      * @return last election
      * @throws IOException if election failed to retrieve
      */
@@ -186,8 +314,10 @@ public class TezosClient {
         try {
             String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns()
                     + "&limit=1&order=desc");
-            List<Election> elections = convertJsonList(json, Election.class, new TypeReference<List<Election>>() {}, new ElectionTableDeserializer());
-            if (elections.isEmpty()) throw new IOException("Failed to get last proposal");
+            List<Election> elections = convertJsonList(json, Election.class, new TypeReference<List<Election>>() {
+            }, new ElectionTableDeserializer());
+            if (elections.isEmpty())
+                throw new IOException("Failed to get last proposal");
             return elections.get(0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -197,6 +327,7 @@ public class TezosClient {
 
     /**
      * Columns of the election table to retrieve from the API
+     * 
      * @return table columns
      */
     private String getElectionColumns() {
@@ -205,15 +336,19 @@ public class TezosClient {
 
     /**
      * Get proposal by its ID
+     * 
      * @param proposalId ID of proposal to retrieve
      * @return proposal
      * @throws IOException if proposal failed to retrieve
      */
     public Proposal getProposal(long proposalId) throws IOException {
         try {
-            String json = doGetRequest(endpoint + "/tables/proposal?columns=" + getProposalColumns() + "&limit=50000&row_id=" + proposalId);
-            List<Proposal> proposals = convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {}, new ProposalTableDeserializer());
-            if (proposals.isEmpty()) throw new IOException("Failed to get proposal" + proposalId);
+            String json = doGetRequest(endpoint + "/tables/proposal?columns=" + getProposalColumns()
+                    + "&limit=50000&row_id=" + proposalId);
+            List<Proposal> proposals = convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {
+            }, new ProposalTableDeserializer());
+            if (proposals.isEmpty())
+                throw new IOException("Failed to get proposal" + proposalId);
             return proposals.get(0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -241,6 +376,7 @@ public class TezosClient {
 
     /**
      * Get the most recent proposal
+     * 
      * @return last proposal
      * @throws IOException if proposal failed to retrieve
      */
@@ -248,8 +384,10 @@ public class TezosClient {
         try {
             String json = doGetRequest(endpoint + "/tables/proposal?columns=" + getProposalColumns()
                     + "&limit=1&order=desc");
-            List<Proposal> proposals = convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {}, new ProposalTableDeserializer());
-            if (proposals.isEmpty()) throw new IOException("Failed to get last proposal");
+            List<Proposal> proposals = convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {
+            }, new ProposalTableDeserializer());
+            if (proposals.isEmpty())
+                throw new IOException("Failed to get last proposal");
             return proposals.get(0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -259,6 +397,7 @@ public class TezosClient {
 
     /**
      * Columns of the proposal table to retrieve from the API
+     * 
      * @return table columns
      */
     private String getProposalColumns() {
@@ -275,7 +414,8 @@ public class TezosClient {
      * @return list of deserialized objects
      * @throws IOException if deserialization fails
      */
-    private <T> List<T> convertJsonList(String json, Class<T> type, TypeReference<List<T>> listType, JsonDeserializer<? extends T> deserializer) throws IOException {
+    private <T> List<T> convertJsonList(String json, Class<T> type, TypeReference<List<T>> listType,
+            JsonDeserializer<? extends T> deserializer) throws IOException {
         return new ObjectMapper()
                 .registerModule(new SimpleModule()
                         .addDeserializer(type, deserializer))
@@ -291,6 +431,7 @@ public class TezosClient {
      * @param url resource to get
      * @return string response
      * @throws Exception if request fails
+     * 
      */
     private String doGetRequest(String url) throws Exception {
         HttpURLConnection urlConnection = (HttpURLConnection) (new URL(url)).openConnection();

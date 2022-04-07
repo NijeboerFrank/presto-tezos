@@ -19,8 +19,9 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Create a new split
+     * 
      * @param table table of the split
-     * @param type type of the split
+     * @param type  type of the split
      * @param value value of the split
      */
     @JsonCreator
@@ -35,6 +36,7 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Create a new split for a block
+     * 
      * @param blockId block height (ID)
      * @return new split
      */
@@ -72,6 +74,10 @@ public class TezosSplit implements ConnectorSplit {
         return forRange(proposalIdStart, proposalIdEnd, TezosTable.PROPOSAL, Type.PROPOSAL_RANGE);
     }
 
+    public static List<ConnectorSplit> forOperationRange(long operationIdStart, long operationIdEnd) {
+        return forRange(operationIdStart, operationIdEnd, TezosTable.OPERATION, Type.OPERATION_RANGE);
+    }
+
     /**
      * Create new splits for a range of IDs
      * @param rangeStart lower bound ID
@@ -96,6 +102,7 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Create a new split for a proposal
+     * 
      * @param proposalId proposal ID
      * @return new split
      */
@@ -105,6 +112,7 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Create a new split for an election
+     * 
      * @param electionId election ID
      * @return new split
      */
@@ -113,7 +121,18 @@ public class TezosSplit implements ConnectorSplit {
     }
 
     /**
+     * Create a new split for an operation
+     * 
+     * @param electionId election ID
+     * @return new split
+     */
+    public static TezosSplit forOperation(long operationId) {
+        return new TezosSplit(TezosTable.OPERATION, Type.OPERATION, operationId);
+    }
+
+    /**
      * Get the table of the split
+     * 
      * @return split table
      */
     @JsonProperty
@@ -123,15 +142,17 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Get the type of the split
+     * 
      * @return split type
      */
     @JsonProperty
-    public  Type getType() {
+    public Type getType() {
         return type;
     }
 
     /**
      * Get the value of the split
+     * 
      * @return split value
      */
     @JsonProperty
@@ -141,11 +162,13 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Get block height (ID) of split
+     * 
      * @return block height (ID)
      * @throws IllegalArgumentException if split type is not for block
      */
     public long getBlockId() {
-        if (type != Type.BLOCK) throw new IllegalArgumentException();
+        if (type != Type.BLOCK)
+            throw new IllegalArgumentException();
         return Long.parseLong(value.toString());
     }
 
@@ -203,25 +226,57 @@ public class TezosSplit implements ConnectorSplit {
         return Long.parseLong(((List) value).get(1).toString());
     }
 
+    /**
+     * Get upper bound operation ID of range
+     * @return operation ID
+     */
+    public long getOperationStartId() {
+        if (type != Type.OPERATION_RANGE) throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(0).toString());
+    }
 
+    /**
+     * Get lower bound operation ID of range
+     * @return operation ID
+     */
+    public long getOperationEndId() {
+        if (type != Type.OPERATION_RANGE) throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(1).toString());
+    }
 
     /**
      * Get election id of split
+     * 
      * @return election id
      * @throws IllegalArgumentException if split type is not for election
      */
     public long getElectionId() {
-        if (type != Type.ELECTION) throw new IllegalArgumentException();
+        if (type != Type.ELECTION)
+            throw new IllegalArgumentException();
         return Long.parseLong(value.toString());
     }
 
     /**
      * Get proposal id of split
+     * 
      * @return proposal id
      * @throws IllegalArgumentException if split type is not for proposal
      */
     public long getProposalId() {
-        if (type != Type.PROPOSAL) throw new IllegalArgumentException();
+        if (type != Type.PROPOSAL)
+            throw new IllegalArgumentException();
+        return Long.parseLong(value.toString());
+    }
+
+    /**
+     * Get operation id of split
+     * 
+     * @return operation id
+     * @throws IllegalArgumentException if split type is not for proposal
+     */
+    public long getOperationId() {
+        if (type != Type.OPERATION)
+            throw new IllegalArgumentException();
         return Long.parseLong(value.toString());
     }
 
@@ -249,6 +304,8 @@ public class TezosSplit implements ConnectorSplit {
         ELECTION,
         ELECTION_RANGE,
         PROPOSAL,
-        PROPOSAL_RANGE
+        PROPOSAL_RANGE,
+        OPERATION,
+        OPERATION_RANGE,
     }
 }
