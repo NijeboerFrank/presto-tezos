@@ -69,7 +69,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
                     converter = TezosSplit::forProposalRange;
                     break;
                 case OPERATION:
-                    lastId  = tezosClient.getLastOperation().getRowId();
+                    lastId  = tezosClient.getLastOperation().getHeight();
                     converter = TezosSplit::forOperationRange;
                     break;
                 default:
