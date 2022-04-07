@@ -54,7 +54,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
 
         try {
             long lastId;
-            BiFunction<Long, Long, List<ConnectorSplit>> converter = null;
+            BiFunction<Long, Long, List<ConnectorSplit>> converter;
             switch (table) {
                 case BLOCK:
                     lastId = tezosClient.getLastBlock().getHeight();
@@ -76,10 +76,9 @@ public class TezosSplitManager implements ConnectorSplitManager {
             if (tableLayoutHandle.getRanges().isEmpty()) {
                 connectorSplits = converter.apply(0L, lastId + 1);
             } else {
-                BiFunction<Long, Long, List<ConnectorSplit>> finalConverter = converter;
                 connectorSplits = tableLayoutHandle.getRanges()
                         .stream()
-                        .flatMap(blockRange -> finalConverter.apply(
+                        .flatMap(blockRange -> converter.apply(
                                 blockRange.getStart(),
                                 blockRange.getEnd() == -1 ? lastId : blockRange.getEnd() + 1).stream()
                         )
