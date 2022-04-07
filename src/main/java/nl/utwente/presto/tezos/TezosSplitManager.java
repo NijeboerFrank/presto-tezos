@@ -3,6 +3,7 @@ package nl.utwente.presto.tezos;
 import com.facebook.presto.spi.*;
 import com.facebook.presto.spi.connector.ConnectorSplitManager;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
+import com.google.common.collect.ImmutableList;
 import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.connector.TezosConnectorConfig;
 import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
@@ -50,23 +51,19 @@ public class TezosSplitManager implements ConnectorSplitManager {
         TezosTable table = TezosTable.valueOf(tableLayoutHandle.getTable().getTableName().toUpperCase());
 
         try {
-            long lastBlockNumber = tezosClient.getLastBlock().getHeight();
-            log.info("current block number: " + lastBlockNumber);
-
             List<ConnectorSplit> connectorSplits;
             switch (table) {
                 case BLOCK:
+                    long lastBlockNumber = tezosClient.getLastBlock().getHeight();
                     if (tableLayoutHandle.getRanges().isEmpty()) {
-                        connectorSplits = LongStream.range(0, lastBlockNumber + 1)
-                                .mapToObj(TezosSplit::forBlock)
-                                .collect(Collectors.toList());
+                        connectorSplits = TezosSplit.forBlockRange(0, lastBlockNumber + 1);
                     } else {
                         connectorSplits = tableLayoutHandle.getRanges()
                                 .stream()
-                                .flatMap(blockRange -> LongStream.range(
+                                .flatMap(blockRange -> TezosSplit.forBlockRange(
                                         blockRange.getStart(),
-                                        blockRange.getEnd() == -1 ? lastBlockNumber : blockRange.getEnd() + 1).boxed())
-                                .map(TezosSplit::forBlock)
+                                        blockRange.getEnd() == -1 ? lastBlockNumber : blockRange.getEnd() + 1).stream()
+                                )
                                 .collect(Collectors.toList());
                     }
 

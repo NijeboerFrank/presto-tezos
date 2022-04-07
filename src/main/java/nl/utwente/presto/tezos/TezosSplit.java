@@ -6,7 +6,9 @@ import com.facebook.presto.spi.NodeProvider;
 import com.facebook.presto.spi.schedule.NodeSelectionStrategy;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,6 +40,26 @@ public class TezosSplit implements ConnectorSplit {
      */
     public static TezosSplit forBlock(long blockId) {
         return new TezosSplit(TezosTable.BLOCK, Type.BLOCK, blockId);
+    }
+
+    /**
+     * Create new splits for a range of blocks
+     * @param blockIdStart lower bound block height (ID)
+     * @param blockIdEnd upper bound block height (ID)
+     * @return new splits
+     */
+    public static List<ConnectorSplit> forBlockRange(long blockIdStart, long blockIdEnd) {
+        long start = blockIdStart;
+        List<ConnectorSplit> splits = new ArrayList<>();
+        while (start <= blockIdEnd) { // Max length
+            splits.add(new TezosSplit(
+                    TezosTable.BLOCK,
+                    Type.BLOCK_RANGE,
+                    ImmutableList.of(start, Math.min(blockIdEnd, start + 49999))
+            ));
+            start += 50000;
+        }
+        return splits;
     }
 
     /**
@@ -96,6 +118,24 @@ public class TezosSplit implements ConnectorSplit {
     }
 
     /**
+     * Get lower bound block height (ID) of range
+     * @return block height (ID)
+     */
+    public long getBlockStartId() {
+        if (type != Type.BLOCK_RANGE) throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(0).toString());
+    }
+
+    /**
+     * Get upper bound block height (ID) of range
+     * @return block height (ID)
+     */
+    public long getBlockEndId() {
+        if (type != Type.BLOCK_RANGE) throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(1).toString());
+    }
+
+    /**
      * Get election id of split
      * @return election id
      * @throws IllegalArgumentException if split type is not for election
@@ -135,6 +175,7 @@ public class TezosSplit implements ConnectorSplit {
      */
     enum Type {
         BLOCK,
+        BLOCK_RANGE,
         ELECTION,
         PROPOSAL
     }

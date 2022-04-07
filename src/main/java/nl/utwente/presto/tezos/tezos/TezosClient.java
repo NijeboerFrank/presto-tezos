@@ -90,6 +90,32 @@ public class TezosClient {
     }
 
     /**
+     * Retrieve blocks in a range
+     * @param start lower bound block height (ID)
+     * @param end upper bound block height (ID)
+     * @return blocks
+     * @throws IOException if blocks failed to retrieve
+     */
+    public List<Block> getBlocks(long start, long end) throws IOException {
+        System.out.println("Getting blocks " + start + " - " + end);
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.gte=" + start + "&height.lte=" + end);
+            return new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Block.class, new BlockTableDeserializer()))
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .reader()
+                    .forType(new TypeReference<List<Block>>() {
+                    })
+                    .readValue(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get blocks between " + start + " and " + end);
+        }
+    }
+
+    /**
      * Get the block that was added last
      * @return last block
      * @throws IOException if block failed to retrieve
