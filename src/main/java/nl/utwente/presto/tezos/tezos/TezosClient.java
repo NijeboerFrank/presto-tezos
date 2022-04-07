@@ -1,6 +1,7 @@
 package nl.utwente.presto.tezos.tezos;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -18,22 +19,30 @@ import java.util.stream.Collectors;
 public class TezosClient {
     private final String endpoint;
 
+    /**
+     * Create a new Tezos client
+     * @param endpoint endpoint to retrieve the data from
+     */
     public TezosClient(String endpoint) {
         this.endpoint = endpoint;
     }
 
-    public Block getHeadBlock() throws IOException {
-        return getBlock("head");
-    }
-
-    public long getLastBlockNumber() throws Exception {
-        return getHeadBlock().getHeight();
-    }
-
+    /**
+     * Get block by its height (ID)
+     * @param height height of block to retrieve
+     * @return block
+     * @throws IOException if block failed to retrieve
+     */
     public Block getBlock(long height) throws IOException {
         return getBlock(String.valueOf(height));
     }
 
+    /**
+     * Get block by its hash
+     * @param hash hash of block to retrieve
+     * @return block
+     * @throws IOException if block failed to retrieve
+     */
     public Block getBlock(String hash) throws IOException {
         try {
             String json = doGetRequest(endpoint + "/explorer/block/" + hash);
@@ -46,164 +55,189 @@ public class TezosClient {
         }
     }
 
+    /**
+     * Get blocks by heights (IDs)
+     * @param heights heights (IDs) of blocks to retrieve
+     * @return blocks
+     * @throws IOException if blocks failed to retrieve
+     */
     public List<Block> getBlocks(long[] heights) throws IOException {
         String heightsIn = Arrays.stream(heights).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
-            String json = doGetRequest(
-                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.in=" + heightsIn);
-            return new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Block.class, new BlockTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Block>>() {
-                    })
-                    .readValue(json);
+            String json = doGetRequest(endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.in=" + heightsIn);
+            return convertJsonList(json, Block.class, new BlockTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get blocks " + heightsIn);
         }
     }
 
+    /**
+     * Get blocks by hashes
+     * @param hashes hashes of blocks to retrieve
+     * @return blocks
+     * @throws IOException if blocks failed to retrieve
+     */
     public List<Block> getBlocks(String[] hashes) throws IOException {
         String hashesIn = String.join(",", hashes);
         try {
-            String json = doGetRequest(
-                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&hash.in=" + hashesIn);
-            return new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Block.class, new BlockTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Block>>() {
-                    })
-                    .readValue(json);
+            String json = doGetRequest(endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&hash.in=" + hashesIn);
+            return convertJsonList(json, Block.class, new BlockTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get blocks " + hashesIn);
         }
     }
 
+    /**
+     * Get the block that was added last
+     * @return last block
+     * @throws IOException if block failed to retrieve
+     */
+    public Block getLastBlock() throws IOException {
+        return getBlock("head");
+    }
+
+    /**
+     * Columns of the block table to retrieve from the API
+     * @return table columns
+     */
     private String getBlocksColumns() {
         return "hash,predecessor,baker,height,cycle,is_cycle_snapshot,time,solvetime,version,round,nonce,voting_period_kind,n_endorsed_slots,n_ops_applied,n_ops_failed,volume,fee,reward,deposit,activated_supply,burned_supply,n_accounts,n_new_accounts,n_new_contracts,n_cleared_accounts,n_funded_accounts,gas_limit,gas_used,storage_paid,pct_account_reuse,n_events,lb_esc_vote,lb_esc_ema";
     }
 
-    private String getElectionColumns() {
-        return "row_id,proposal_id,num_periods,num_proposals,voting_period,start_time,end_time,start_height,end_height,is_empty,is_open,is_failed,no_quorum,no_majority,proposal,last_voting_period";
-    }
-
-    private String getProposalColumns() {
-        return "row_id,hash,height,time,source_id,op_id,election_id,voting_period,rolls,voters,source,op";
-    }
-
+    /**
+     * Get election by its ID
+     * @param electionId ID of election to retrieve
+     * @return election
+     * @throws IOException if election failed to retrieve
+     */
     public Election getElection(long electionId) throws IOException {
         try {
-            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&row_id="+electionId);
-            List<Election> resp = new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Election.class, new ElectionTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Election>>() {
-                    })
-                    .readValue(json);
-            if (resp.size() > 0) {
-                return resp.get(0);
-            } else {
-                return null;
-            }
+            String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id=" + electionId);
+            List<Election> election = convertJsonList(json, Election.class, new ElectionTableDeserializer());
+            if (election.isEmpty()) throw new IOException("Failed to get election " + electionId);
+            return election.get(0);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get election "+electionId);
+            throw new IOException("Failed to get election " + electionId);
         }
     }
 
-    public Proposal getProposal(long proposalId) throws IOException {
+    /**
+     * Get elections by their ID
+     * @param electionIds IDs of elections to retrieve
+     * @return elections
+     * @throws IOException if elections failed to retrieve
+     */
+    public List<Election> getElections(long[] electionIds) throws IOException {
+        String proposalIdList = Arrays.stream(electionIds).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
-            String json = doGetRequest(endpoint+"/tables/proposal?columns="+getProposalColumns()+"&limit=50000&row_id="+proposalId);
-            List<Proposal> resp = new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Proposal.class, new ProposalTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Proposal>>() {
-                    })
-                    .readValue(json);
-            if (resp.size() > 0) {
-                return resp.get(0);
-            } else {
-                return null;
-            }
+            String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id.in=" + proposalIdList);
+            return convertJsonList(json, Election.class, new ElectionTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get proposal "+proposalId);
+            throw new IOException("Failed to get elections " + proposalIdList);
         }
     }
-
-    public Proposal getLastProposal() throws IOException {
-        try {
-            String json = doGetRequest(endpoint+"/tables/proposal?columns="+getProposalColumns()+"&limit=1&order=desc");
-            List<Proposal> resp = new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Proposal.class, new ProposalTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Proposal>>() {
-                    })
-                    .readValue(json);
-            if (resp.size() > 0) {
-                return resp.get(0);
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Failed to get last proposal");
-        }
-
-    }
-
+    /**
+     * Get the most recent election
+     * @return last election
+     * @throws IOException if election failed to retrieve
+     */
     public Election getLastElection() throws IOException {
         try {
             String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns()
                     + "&limit=1&order=desc");
-            List<Election> resp = new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Election.class, new ElectionTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Election>>() {
-                    })
-                    .readValue(json);
-            if (resp.size() > 0) {
-                return resp.get(resp.size() - 1);
-            } else {
-                return null;
-            }
+            List<Election> elections = convertJsonList(json, Election.class, new ElectionTableDeserializer());
+            if (elections.isEmpty()) throw new IOException("Failed to get last proposal");
+            return elections.get(0);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get election head");
         }
     }
 
-    public List<Election> getElections(long[] electionIds) throws IOException {
-        String proposalIdList = Arrays.stream(electionIds).mapToObj(String::valueOf).collect(Collectors.joining(","));
+    /**
+     * Columns of the election table to retrieve from the API
+     * @return table columns
+     */
+    private String getElectionColumns() {
+        return "row_id,proposal_id,num_periods,num_proposals,voting_period,start_time,end_time,start_height,end_height,is_empty,is_open,is_failed,no_quorum,no_majority,proposal,last_voting_period";
+    }
+
+    /**
+     * Get proposal by its ID
+     * @param proposalId ID of proposal to retrieve
+     * @return proposal
+     * @throws IOException if proposal failed to retrieve
+     */
+    public Proposal getProposal(long proposalId) throws IOException {
         try {
-            String json = doGetRequest(endpoint+"/tables/election?columns="+getElectionColumns()+"&limit=50000&row_id.in="+proposalIdList);
-            return new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Election.class, new ElectionTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Election>>() {
-                    })
-                    .readValue(json);
+            String json = doGetRequest(endpoint + "/tables/proposal?columns=" + getProposalColumns() + "&limit=50000&row_id=" + proposalId);
+            List<Proposal> proposals = convertJsonList(json, Proposal.class, new ProposalTableDeserializer());
+            if (proposals.isEmpty()) throw new IOException("Failed to get proposal" + proposalId);
+            return proposals.get(0);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Failed to get elections " + proposalIdList);
+            throw new IOException("Failed to get proposal " + proposalId);
         }
     }
 
+    /**
+     * Get the most recent proposal
+     * @return last proposal
+     * @throws IOException if proposal failed to retrieve
+     */
+    public Proposal getLastProposal() throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/proposal?columns=" + getProposalColumns()
+                    + "&limit=1&order=desc");
+            List<Proposal> proposals = convertJsonList(json, Proposal.class, new ProposalTableDeserializer());
+            if (proposals.isEmpty()) throw new IOException("Failed to get last proposal");
+            return proposals.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get last proposal");
+        }
+    }
+
+    /**
+     * Columns of the proposal table to retrieve from the API
+     * @return table columns
+     */
+    private String getProposalColumns() {
+        return "row_id,hash,height,time,source_id,op_id,election_id,voting_period,rolls,voters,source,op";
+    }
+
+    /**
+     * Convert a JSON string into a list of objects
+     *
+     * @param json         JSON string
+     * @param type         object class
+     * @param deserializer object deserializer
+     * @param <T>          object type
+     * @return list of deserialized objects
+     * @throws IOException if deserialization fails
+     */
+    private <T> List<T> convertJsonList(String json, Class<T> type, JsonDeserializer<? extends T> deserializer) throws IOException {
+        return new ObjectMapper()
+                .registerModule(new SimpleModule()
+                        .addDeserializer(type, deserializer))
+                .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                .reader()
+                .forType(new TypeReference<List<T>>() {
+                })
+                .readValue(json);
+    }
+
+    /**
+     * Execute a get request
+     *
+     * @param url resource to get
+     * @return string response
+     * @throws Exception if request fails
+     */
     private String doGetRequest(String url) throws Exception {
         HttpURLConnection urlConnection = (HttpURLConnection) (new URL(url)).openConnection();
         urlConnection.setRequestMethod("GET");
