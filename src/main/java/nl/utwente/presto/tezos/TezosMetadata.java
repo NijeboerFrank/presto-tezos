@@ -211,7 +211,7 @@ public class TezosMetadata extends BaseTezosMetadata {
         long startBlock = 1L;
         long currentBlock = 0;
         try {
-            currentBlock = tezosClient.getLastBlockNumber();
+            currentBlock = tezosClient.getLastBlock().getHeight();
         } catch (Exception e) {
             e.printStackTrace();
         }
