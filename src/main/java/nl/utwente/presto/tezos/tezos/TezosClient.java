@@ -65,7 +65,7 @@ public class TezosClient {
         String heightsIn = Arrays.stream(heights).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
             String json = doGetRequest(endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.in=" + heightsIn);
-            return convertJsonList(json, Block.class, new BlockTableDeserializer());
+            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {}, new BlockTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get blocks " + heightsIn);
@@ -82,7 +82,7 @@ public class TezosClient {
         String hashesIn = String.join(",", hashes);
         try {
             String json = doGetRequest(endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&hash.in=" + hashesIn);
-            return convertJsonList(json, Block.class, new BlockTableDeserializer());
+            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {}, new BlockTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get blocks " + hashesIn);
@@ -100,7 +100,7 @@ public class TezosClient {
         try {
             String json = doGetRequest(
                     endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.gte=" + start + "&height.lte=" + end);
-            return convertJsonList(json, Block.class, new BlockTableDeserializer());
+            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {}, new BlockTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get blocks between " + start + " and " + end);
@@ -133,7 +133,7 @@ public class TezosClient {
     public Election getElection(long electionId) throws IOException {
         try {
             String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id=" + electionId);
-            List<Election> election = convertJsonList(json, Election.class, new ElectionTableDeserializer());
+            List<Election> election = convertJsonList(json, Election.class, new TypeReference<List<Election>>() {}, new ElectionTableDeserializer());
             if (election.isEmpty()) throw new IOException("Failed to get election " + electionId);
             return election.get(0);
         } catch (Exception e) {
@@ -152,7 +152,7 @@ public class TezosClient {
         String proposalIdList = Arrays.stream(electionIds).mapToObj(String::valueOf).collect(Collectors.joining(","));
         try {
             String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id.in=" + proposalIdList);
-            return convertJsonList(json, Election.class, new ElectionTableDeserializer());
+            return convertJsonList(json, Election.class, new TypeReference<List<Election>>() {}, new ElectionTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get elections " + proposalIdList);
@@ -170,7 +170,7 @@ public class TezosClient {
         try {
             String json = doGetRequest(
                     endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id.gte=" + start + "&row_id.lte=" + end);
-            return convertJsonList(json, Election.class, new ElectionTableDeserializer());
+            return convertJsonList(json, Election.class, new TypeReference<List<Election>>() {}, new ElectionTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get elections between " + start + " and " + end);
@@ -186,7 +186,7 @@ public class TezosClient {
         try {
             String json = doGetRequest(endpoint + "/tables/election?columns=" + getElectionColumns()
                     + "&limit=1&order=desc");
-            List<Election> elections = convertJsonList(json, Election.class, new ElectionTableDeserializer());
+            List<Election> elections = convertJsonList(json, Election.class, new TypeReference<List<Election>>() {}, new ElectionTableDeserializer());
             if (elections.isEmpty()) throw new IOException("Failed to get last proposal");
             return elections.get(0);
         } catch (Exception e) {
@@ -212,7 +212,7 @@ public class TezosClient {
     public Proposal getProposal(long proposalId) throws IOException {
         try {
             String json = doGetRequest(endpoint + "/tables/proposal?columns=" + getProposalColumns() + "&limit=50000&row_id=" + proposalId);
-            List<Proposal> proposals = convertJsonList(json, Proposal.class, new ProposalTableDeserializer());
+            List<Proposal> proposals = convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {}, new ProposalTableDeserializer());
             if (proposals.isEmpty()) throw new IOException("Failed to get proposal" + proposalId);
             return proposals.get(0);
         } catch (Exception e) {
@@ -232,7 +232,7 @@ public class TezosClient {
         try {
             String json = doGetRequest(
                     endpoint + "/tables/proposal?columns=" + getProposalColumns() + "&limit=50000&row_id.gte=" + start + "&row_id.lte=" + end);
-            return convertJsonList(json, Proposal.class, new ProposalTableDeserializer());
+            return convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {}, new ProposalTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get proposals between " + start + " and " + end);
@@ -248,7 +248,7 @@ public class TezosClient {
         try {
             String json = doGetRequest(endpoint + "/tables/proposal?columns=" + getProposalColumns()
                     + "&limit=1&order=desc");
-            List<Proposal> proposals = convertJsonList(json, Proposal.class, new ProposalTableDeserializer());
+            List<Proposal> proposals = convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {}, new ProposalTableDeserializer());
             if (proposals.isEmpty()) throw new IOException("Failed to get last proposal");
             return proposals.get(0);
         } catch (Exception e) {
@@ -275,14 +275,13 @@ public class TezosClient {
      * @return list of deserialized objects
      * @throws IOException if deserialization fails
      */
-    private <T> List<T> convertJsonList(String json, Class<T> type, JsonDeserializer<? extends T> deserializer) throws IOException {
+    private <T> List<T> convertJsonList(String json, Class<T> type, TypeReference<List<T>> listType, JsonDeserializer<? extends T> deserializer) throws IOException {
         return new ObjectMapper()
                 .registerModule(new SimpleModule()
                         .addDeserializer(type, deserializer))
                 .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                 .reader()
-                .forType(new TypeReference<List<T>>() {
-                })
+                .forType(listType)
                 .readValue(json);
     }
 
