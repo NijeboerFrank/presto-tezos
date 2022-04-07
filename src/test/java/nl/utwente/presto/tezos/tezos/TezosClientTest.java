@@ -52,6 +52,13 @@ public class TezosClientTest {
     }
 
     @Test
+    public void testOperation() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Operation operation = tezosClient.getOperation(65537);
+        assertTrue(operation.getRowId() == 65537);
+    }
+
+    @Test
     public void testElections() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
         List<Election> elections = tezosClient.getElections(new long[] { 1, 3 });

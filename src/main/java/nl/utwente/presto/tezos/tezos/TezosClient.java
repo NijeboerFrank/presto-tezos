@@ -127,7 +127,7 @@ public class TezosClient {
     public Operation getOperation(long operationId) throws IOException {
         try {
             String json = doGetRequest(endpoint + "/tables/op?columns=" + getOperationsColumns()
-                    + "&limit=50000&row_id=" + operationId);
+                    + "&limit=50000&id=" + operationId);
             List<Operation> operations = convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {
             }, new OperationTableDeserializer());
             if (operations.isEmpty())
@@ -210,6 +210,16 @@ public class TezosClient {
             e.printStackTrace();
             throw new IOException("Failed to get last operation");
         }
+    }
+
+    /**
+     *
+     * Hardcoded list of columns to be returned for the operations table API
+     * 
+     * @return string of columns names for the operations table API
+     */
+    private String getOperationsColumns() {
+        return "id,type,hash,height,cycle,time,op_n,op_p,status,is_success,is_contract,is_internal,is_event,counter,gas_limit,gas_used,storage_limit,storage_paid,volume,fee,reward,deposit,burned,sender_id,receiver_id,creator_id,baker_id,data,parameters,storage,big_map_diff,errors,days_destroyed,sender,receiver,creator,baker,block,entrypoint";
     }
 
     /**
@@ -355,16 +365,6 @@ public class TezosClient {
                 .reader()
                 .forType(listType)
                 .readValue(json);
-    }
-
-    /**
-     *
-     * Hardcoded list of columns to be returned for the operations table API
-     * 
-     * @return string of columns names for the operations table API
-     */
-    private String getOperationsColumns() {
-        return "row_id,type,hash,height,cycle,time,op_n,op_p,status,is_success,is_contract,is_internal,is_event,counter,gas_limit,gas_used,storage_limit,storage_paid,volume,fee,reward,deposit,burned,sender_id,receiver_id,creator_id,baker_id,data,parameters,storage,big_map_diff,errors,days_destroyed,sender,receiver,creator,baker,block,entrypoint";
     }
 
     /**
