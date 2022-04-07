@@ -176,18 +176,18 @@ public class TezosMetadata extends BaseTezosMetadata {
         } else if (TezosTable.CONTRACT.getName().equals(table)) {
             builder.add(new Pair<>("contract_id", BigintType.BIGINT));
             builder.add(new Pair<>("contract_address", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("contract_account_Id", BigintType.BIGINT));
-            builder.add(new Pair<>("contract_creator_Id", BigintType.BIGINT));
-            builder.add(new Pair<>("contract_first_Seen", BigintType.BIGINT));
-            builder.add(new Pair<>("contract_last_Seen", BigintType.BIGINT));
-            builder.add(new Pair<>("contract_storage_Size", BigintType.BIGINT));
-            builder.add(new Pair<>("contract_storage_Paid", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_accountId", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_creatorId", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_firstSeen", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_lastSeen", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_storageSize", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_storagePaid", BigintType.BIGINT));
             builder.add(new Pair<>("contract_script", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("contract_storage", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("contract_iface_Hash", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("contract_code_Hash", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("contract_storage_Hash", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("contract_call_Stats", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_ifaceHash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_codeHash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_storageHash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_callStats", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("contract_features", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("contract_interfaces", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("contract_creator", VarcharType.createUnboundedVarcharType()));
