@@ -68,7 +68,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                 switch (columnName) {
                     case "block_height":
                     case "election_id":
-                        // TODO Filter on proposal ID
+                    case "proposal_id":
                         // Limit query to block number range
                         orderedRanges.forEach(r -> {
                             Marker low = r.getLow();
@@ -178,6 +178,19 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("election_noMajority", BooleanType.BOOLEAN));
             builder.add(new Pair<>("election_proposal", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("election_lastVotingPeriod", VarcharType.createUnboundedVarcharType()));
+        } else if (TezosTable.PROPOSAL.getName().equals(table)) {
+            builder.add(new Pair<>("proposal_id", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_hash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_height", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_time", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_sourceId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_opId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_electionId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_votingPeriod", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_rolls", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_voters", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_source", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_op", VarcharType.createUnboundedVarcharType()));
         }
 
         else {

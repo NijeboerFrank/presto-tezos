@@ -46,7 +46,7 @@ public class TezosSplit implements ConnectorSplit {
      * @return new split
      */
     public static TezosSplit forProposal(long proposalId) {
-        return new TezosSplit(TezosTable.ELECTION, Type.PROPOSAL, proposalId);
+        return new TezosSplit(TezosTable.PROPOSAL, Type.PROPOSAL, proposalId);
     }
 
     /**

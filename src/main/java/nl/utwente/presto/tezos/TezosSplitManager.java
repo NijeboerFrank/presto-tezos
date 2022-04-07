@@ -89,6 +89,23 @@ public class TezosSplitManager implements ConnectorSplitManager {
                     }
                     log.info("Built %d splits", connectorSplits.size());
                     return new FixedSplitSource(connectorSplits);
+                case PROPOSAL:
+                    long lastProposal = tezosClient.getLastProposal().getRowId();
+                    if (tableLayoutHandle.getRanges().isEmpty()) {
+                        connectorSplits = LongStream.range(0, lastProposal + 1)
+                                .mapToObj(TezosSplit::forProposal)
+                                .collect(Collectors.toList());
+                    } else {
+                        connectorSplits = tableLayoutHandle.getRanges()
+                                .stream()
+                                .flatMap(blockRange -> LongStream.range(
+                                        blockRange.getStart(),
+                                        blockRange.getEnd() == -1 ? lastProposal : blockRange.getEnd() + 1).boxed())
+                                .map(TezosSplit::forProposal)
+                                .collect(Collectors.toList());
+                    }
+                    log.info("Built %d splits", connectorSplits.size());
+                    return new FixedSplitSource(connectorSplits);
                 default:
                     throw new RuntimeException("Cannot make a split from this range");
             }
