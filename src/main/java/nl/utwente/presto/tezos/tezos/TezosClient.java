@@ -143,6 +143,115 @@ public class TezosClient {
     }
 
     /**
+     * Get operation by its ID
+     * 
+     * @param operationId ID of operation to retrieve
+     * @return operation
+     * @throws IOException if operation failed to retrieve
+     */
+    public Operation getOperation(long operationId) throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/op?columns=" + getOperationsColumns()
+                    + "&limit=50000&id=" + operationId);
+            List<Operation> operations = convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {
+            }, new OperationTableDeserializer());
+            if (operations.isEmpty())
+                throw new IOException("Failed to get operation" + operationId);
+            return operations.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get operation " + operationId);
+        }
+    }
+
+    /**
+     * Retrieve operations in a range
+     * @param start lower bound operation ID
+     * @param end upper bound operation ID
+     * @return operations
+     * @throws IOException if operations failed to retrieve
+     */
+    public List<Operation> getOperations(long start, long end) throws IOException {
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/op?columns=" + getOperationsColumns() + "&limit=50000&height.gte=" + start + "&height.lte=" + end);
+            return convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {}, new OperationTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get proposals between " + start + " and " + end);
+        }
+    }
+
+    /**
+     * Retrieves operations with the given heights from the API
+     * 
+     * @param heights list of heights of requested operations
+     * @return a list of Operations with the given heights
+     * @throws IOException
+     */
+    public List<Operation> getOperations(long[] heights) throws IOException {
+        String heightsIn = Arrays.stream(heights).mapToObj(String::valueOf).collect(Collectors.joining(","));
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/op?columns=" + getOperationsColumns() + "&limit=50000&height.in=" + heightsIn);
+            return convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {}, new OperationTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get operations " + heightsIn);
+        }
+    }
+
+    /**
+     * Retrieves operations with the given hashes from the API
+     * 
+     * @param hashes list of hashes of requested operations
+     * @return a list of Operations with the given hashes
+     * @throws IOException
+     */
+    public List<Operation> getOperations(String[] hashes) throws IOException {
+        String hashesIn = String.join(",", hashes);
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/op?columns=" + getOperationsColumns() + "&limit=50000&hash.in=" + hashesIn);
+            return convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {}, new OperationTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get blocks " + hashesIn);
+        }
+    }
+
+    /**
+     * Get the most recent operation
+     * 
+     * @return last operation
+     * @throws IOException if operation failed to retrieve
+     */
+    public Operation getLastOperation() throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/op?columns=" + getOperationsColumns()
+                    + "&limit=1&order=desc");
+            List<Operation> operations = convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {
+            }, new OperationTableDeserializer());
+            if (operations.isEmpty())
+                throw new IOException("Failed to get last operation");
+            return operations.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get last operation");
+        }
+    }
+
+    /**
+     *
+     * Hardcoded list of columns to be returned for the operations table API
+     * 
+     * @return string of columns names for the operations table API
+     */
+    private String getOperationsColumns() {
+        return "id,type,hash,height,cycle,time,op_n,op_p,status,is_success,is_contract,is_internal,is_event,counter,gas_limit,gas_used,storage_limit,storage_paid,volume,fee,reward,deposit,burned,sender_id,receiver_id,creator_id,baker_id,data,parameters,storage,big_map_diff,errors,days_destroyed,sender,receiver,creator,baker,block,entrypoint";
+    }
+
+    /**
      * Get election by its ID
      * 
      * @param electionId ID of election to retrieve
@@ -424,6 +533,7 @@ public class TezosClient {
      * @param url resource to get
      * @return string response
      * @throws Exception if request fails
+     * 
      */
     private String doGetRequest(String url) throws Exception {
         HttpURLConnection urlConnection = (HttpURLConnection) (new URL(url)).openConnection();

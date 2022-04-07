@@ -9,6 +9,9 @@ import lombok.Setter;
 
 import java.time.Instant;
 
+/**
+ * Represents a Block data object
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -67,6 +70,11 @@ public class Block {
         return Instant.parse(this.time).getEpochSecond();
     }
 
+    /**
+     * The timestamp of the current block as epoch second milliseconds
+     * 
+     * @return the timestamp of the current block as epoch milliseconds
+     */
     public Number getTimestampMillis() {
         return Instant.parse(this.time).getEpochSecond() * 1000;
     }

@@ -52,8 +52,8 @@ public class TezosSplitManager implements ConnectorSplitManager {
         TezosTableLayoutHandle tableLayoutHandle = convertLayout(layout);
         TezosTable table = TezosTable.valueOf(tableLayoutHandle.getTable().getTableName().toUpperCase());
 
+        long lastId;
         try {
-            long lastId;
             BiFunction<Long, Long, List<ConnectorSplit>> converter;
             switch (table) {
                 case BLOCK:
@@ -72,6 +72,10 @@ public class TezosSplitManager implements ConnectorSplitManager {
                     lastId = tezosClient.getLastContract().getRowId();
                     converter = TezosSplit::forContractRange;
                     break;
+                case OPERATION:
+                    lastId  = tezosClient.getLastOperation().getHeight();
+                    converter = TezosSplit::forOperationRange;
+                    break;
                 default:
                     throw new RuntimeException("Cannot make a split from this range");
             }
@@ -84,8 +88,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
                         .stream()
                         .flatMap(range -> converter.apply(
                                 range.getStart(),
-                                range.getEnd() == -1 ? lastId : range.getEnd() + 1).stream()
-                        )
+                                range.getEnd() == -1 ? lastId : range.getEnd() + 1).stream())
                         .collect(Collectors.toList());
             }
 

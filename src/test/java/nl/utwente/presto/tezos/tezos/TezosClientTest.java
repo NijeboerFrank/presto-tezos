@@ -8,6 +8,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TezosClientTest {
+    /**
+     * Requests a block at height one, and checks if the requested Block object's
+     * hash is equal to the hardcoded hash of that block.
+     * 
+     * @throws IOException
+     */
     @Test
     public void testBlock() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
@@ -16,6 +22,12 @@ public class TezosClientTest {
         assertEquals("BLSqrcLvFtqVCx8WSqkVJypW2kAVRM3eEj2BHgBsB6kb24NqYev", block.getHash());
     }
 
+    /**
+     * Requests multiple blocks at height 1 and 2, and checks if the heights of the
+     * returned objects actually are 1 and 2.
+     * 
+     * @throws IOException
+     */
     @Test
     public void testBlocks() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
@@ -28,6 +40,27 @@ public class TezosClientTest {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
         Contract contract = tezosClient.getContract("KT1Puc9St8wdNoGtLiD2WXaHbWU7styaxYhD");
         assertEquals(818425L, contract.getAccountId());
+    }
+
+    /**
+     * Requests multiple operations at height 1 and 2, and checks if the hash is
+     * equal to the hardcoded hash of the first operation.
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void testOperations() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        List<Operation> operations = tezosClient.getOperations(new long[] { 1, 2 });
+        assertTrue(operations.stream()
+                .anyMatch(b -> b.getHash().equals("oneDGhZacw99EEFaYDTtWfz5QEhUW3PPVFsHa7GShnLPuDn7gSd")));
+    }
+
+    @Test
+    public void testOperation() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Operation operation = tezosClient.getOperation(65537);
+        assertTrue(operation.getRowId() == 65537);
     }
 
     @Test
@@ -64,4 +97,13 @@ public class TezosClientTest {
         Proposal proposal = tezosClient.getProposal(1);
         assertTrue(proposal.getRowId() == 1);
     }
+
+    @Test
+    public void testProposals() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        List<Proposal> proposals = tezosClient.getProposals(1, 3);
+        assertTrue(proposals.stream().anyMatch(b -> b.getRowId() == 1));
+        assertTrue(proposals.stream().anyMatch(b -> b.getRowId() == 3));
+    }
+
 }

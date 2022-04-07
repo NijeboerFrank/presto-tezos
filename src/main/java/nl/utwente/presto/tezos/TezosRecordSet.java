@@ -4,14 +4,17 @@ import com.facebook.presto.common.type.Type;
 import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
 import com.google.common.collect.ImmutableList;
+
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.recordCursor.TezosBlockRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosContractRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosElectionRecordCursor;
+import nl.utwente.presto.tezos.recordCursor.TezosOperationRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosProposalRecordCursor;
 import nl.utwente.presto.tezos.tezos.Block;
 import nl.utwente.presto.tezos.tezos.Contract;
 import nl.utwente.presto.tezos.tezos.Election;
+import nl.utwente.presto.tezos.tezos.Operation;
 import nl.utwente.presto.tezos.tezos.Proposal;
 import nl.utwente.presto.tezos.tezos.TezosClient;
 
@@ -102,12 +105,27 @@ public class TezosRecordSet implements RecordSet {
                             break;
                         case CONTRACT_RANGE:
                             contracts = tezosClient.getContracts(split.getContractStartId(), split.getContractEndId());
-                            break;
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 return new TezosContractRecordCursor(columnHandles, contracts, split.getTable());
+            case OPERATION:
+                List<Operation> operations = null;
+                try {
+                    switch (split.getType()) {
+                        case OPERATION:
+                            operations = ImmutableList.of(tezosClient.getOperation(split.getOperationId()));
+                            break;
+                        case OPERATION_RANGE:
+                            operations = tezosClient.getOperations(split.getOperationStartId(),
+                                    split.getOperationEndId());
+                            break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return new TezosOperationRecordCursor(columnHandles, operations, split.getTable());
             default:
                 return null;
         }
