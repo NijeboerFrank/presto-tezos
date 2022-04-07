@@ -31,13 +31,12 @@ public class TezosOperationRecordCursor extends BaseTezosRecordCursor {
 
     @Override
     public long getCompletedBytes() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public boolean advanceNextPosition() {
-        if (table == TezosTable.OPERATION && !operationIter.hasNext()) {
+        if (table != TezosTable.OPERATION || !operationIter.hasNext()) {
             return false;
         }
 

@@ -99,7 +99,7 @@ public class Block {
     }
 
     /**
-     * the timestamp of the current block as epoch second milliseconds
+     * The timestamp of the current block as epoch second milliseconds
      * 
      * @return the timestamp of the current block as epoch milliseconds
      */
