@@ -6,7 +6,6 @@ import com.facebook.presto.spi.NodeProvider;
 import com.facebook.presto.spi.schedule.NodeSelectionStrategy;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,32 +13,29 @@ import java.util.List;
 public class TezosSplit implements ConnectorSplit {
 
     private final TezosTable table;
-    private final long blockId;
-    private final long electionId;
-    private final long proposalId;
+    private final Type type;
+    private final Object value;
 
     @JsonCreator
     public TezosSplit(
             @JsonProperty("table") TezosTable table,
-            @JsonProperty("blockId") long blockId,
-            @JsonProperty("electionId") long electionId,
-            @JsonProperty("proposalId") long proposalId) {
+            @JsonProperty("type") Type type,
+            @JsonProperty("value") Object value) {
         this.table = table;
-        this.blockId = blockId;
-        this.electionId = electionId;
-        this.proposalId = proposalId;
+        this.type = type;
+        this.value = value;
     }
 
     public static TezosSplit forBlock(long blockId) {
-        return new TezosSplit(TezosTable.BLOCK, blockId, 0, 0);
+        return new TezosSplit(TezosTable.BLOCK, Type.BLOCK, blockId);
     }
 
     public static TezosSplit forProposal(long proposalId) {
-        return new TezosSplit(TezosTable.ELECTION, 0, 0, proposalId);
+        return new TezosSplit(TezosTable.ELECTION, Type.PROPOSAL, proposalId);
     }
 
     public static TezosSplit forElection(long electionId) {
-        return new TezosSplit(TezosTable.ELECTION, 0, electionId, 0);
+        return new TezosSplit(TezosTable.ELECTION, Type.ELECTION, electionId);
     }
 
     @JsonProperty
@@ -48,18 +44,28 @@ public class TezosSplit implements ConnectorSplit {
     }
 
     @JsonProperty
+    public  Type getType() {
+        return type;
+    }
+
+    @JsonProperty
+    public Object getValue() {
+        return value;
+    }
+
     public long getBlockId() {
-        return blockId;
+        if (type != Type.BLOCK) throw new IllegalArgumentException();
+        return Long.parseLong(value.toString());
     }
 
-    @JsonProperty
     public long getElectionId() {
-        return electionId;
+        if (type != Type.ELECTION) throw new IllegalArgumentException();
+        return Long.parseLong(value.toString());
     }
 
-    @JsonProperty
     public long getProposalId() {
-        return proposalId;
+        if (type != Type.PROPOSAL) throw new IllegalArgumentException();
+        return Long.parseLong(value.toString());
     }
 
     @Override
@@ -75,5 +81,11 @@ public class TezosSplit implements ConnectorSplit {
     @Override
     public Object getInfo() {
         return this;
+    }
+
+    enum Type {
+        BLOCK,
+        ELECTION,
+        PROPOSAL
     }
 }
