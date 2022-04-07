@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,12 +29,4 @@ public class Contract {
     private String features;
     private String interfaces;
     private String creator;
-
-    /**
-     * Retrieves the contract
-     * @return Contract
-     */
-    public Contract getContract() {
-        return this;
-    }
 }
