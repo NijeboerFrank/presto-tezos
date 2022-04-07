@@ -68,15 +68,8 @@ public class TezosMetadata extends BaseTezosMetadata {
                 switch (columnName) {
                     case "block_height":
                     case "election_id":
-                        // TODO Filter on proposal ID
-                        // Limit query to block number range
-                        orderedRanges.forEach(r -> {
-                            Marker low = r.getLow();
-                            Marker high = r.getHigh();
-                            builder.add(TezosRange.fromMarkers(columnName, low, high));
-                        });
-                        break;
                     case "proposal_id":
+                        // Limit query to block number range
                         orderedRanges.forEach(r -> {
                             Marker low = r.getLow();
                             Marker high = r.getHigh();
