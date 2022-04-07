@@ -32,6 +32,10 @@ public class Contract {
     private String interfaces;
     private String creator;
 
+    /**
+     * Retrieves the contract
+     * @return Contract
+     */
     public Contract getContract() {
         return this;
     }

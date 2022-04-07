@@ -31,7 +31,7 @@ public class ContractTableDeserializer extends JsonDeserializer<Contract> {
                 iterator.next().asText(), // call_stats
                 iterator.next().asText(), // features
                 iterator.next().asText(), // interfacesa
-                iterator.next().asText() //creator
+                iterator.next().asText() // creator
         );
     }
 }

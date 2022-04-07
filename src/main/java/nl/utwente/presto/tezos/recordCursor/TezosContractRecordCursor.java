@@ -39,7 +39,7 @@ public class TezosContractRecordCursor extends BaseTezosRecordCursor {
 
     @Override
     public boolean advanceNextPosition() {
-        if (table == TezosTable.CONTRACT && !contractIter.hasNext()) {
+        if (table != TezosTable.CONTRACT && !contractIter.hasNext()) {
             return false;
         }
 

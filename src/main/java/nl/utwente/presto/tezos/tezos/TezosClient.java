@@ -184,96 +184,6 @@ public class TezosClient {
         }
     }
 
-    public Contract getContract(long row_id) throws IOException {
-        try {
-            String json = doGetRequest(
-                    endpoint + "/tables/contract?columns=" + getContractColumns() + "/row_id=" + row_id);
-            List<Contract> resp = new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Contract.class, new ContractTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Contract>>() {
-                    })
-                    .readValue(json);
-            if (resp.size() > 0) {
-                return resp.get(0);
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Failed to get contract with row_id " + row_id);
-        }
-
-    }
-
-    public List<Contract> getContracts(long startId, long endId) throws IOException {
-        try {
-            String json = doGetRequest(endpoint + "/tables/contract?columns=" + getContractColumns() + "&row_id.gte="
-                    + startId + "&row_id.lte=" + endId);
-            List<Contract> resp = new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Contract.class, new ContractTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Contract>>() {
-                    })
-                    .readValue(json);
-            return resp;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Failed to get contract with range");
-        }
-
-    }
-
-    public Contract getContract(String hash) throws IOException {
-        try {
-            String json = doGetRequest(
-                    endpoint + "/tables/contract?columns=" + getContractColumns() + "&limit=50000&address=" + hash);
-            List<Contract> resp = new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Contract.class, new ContractTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Contract>>() {
-                    })
-                    .readValue(json);
-            if (resp.size() > 0) {
-                return resp.get(0);
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Failed to get contract " + hash);
-        }
-    }
-
-    public Contract getLastContract() throws IOException {
-        try {
-            String json = doGetRequest(
-                    endpoint + "/tables/contract?columns=" + getContractColumns() + "&limit=1&order=desc");
-            List<Contract> resp = new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Contract.class, new ContractTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Contract>>() {
-                    })
-                    .readValue(json);
-            if (resp.size() > 0) {
-                return resp.get(resp.size() - 1);
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Failed to get contract head");
-        }
-    }
-
     /**
      * Retrieve elections in a range
      * 
@@ -396,6 +306,95 @@ public class TezosClient {
      */
     private String getProposalColumns() {
         return "row_id,hash,height,time,source_id,op_id,election_id,voting_period,rolls,voters,source,op";
+    }
+
+
+
+    /**
+     * Get contract by its ID
+     *
+     * @param contractId ID of contract to retrieve
+     * @return contract
+     * @throws IOException if contract failed to retrieve
+     */
+    public Contract getContract(long contractId) throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/contract?columns=" + getContractColumns()
+                    + "&limit=50000&row_id=" + contractId);
+            List<Contract> contracts = convertJsonList(json, Contract.class, new TypeReference<List<Contract>>() {
+            }, new ContractTableDeserializer());
+            if (contracts.isEmpty())
+                throw new IOException("Failed to get contract" + contractId);
+            return contracts.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get contract " + contractId);
+        }
+    }
+
+    /**
+     * Get contract by its Hash
+     *
+     * @param hash hash of contract we want to retrieve
+     * @return contract
+     * @throws IOException if contract failed to retrieve
+     */
+    public Contract getContract(String hash) throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/contract?columns=" + getContractColumns()
+                    + "&limit=50000&address=" + hash);
+            List<Contract> contracts = convertJsonList(json, Contract.class, new TypeReference<List<Contract>>() {
+            }, new ContractTableDeserializer());
+            if (contracts.isEmpty())
+                throw new IOException("Failed to get contract" + hash);
+            return contracts.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get contract " + hash);
+        }
+    }
+
+
+    /**
+     * Retrieve contracts in a range
+     *
+     * @param start lower bound contract ID
+     * @param end   upper bound contract ID
+     * @return contracts
+     * @throws IOException if contracts failed to retrieve
+     */
+    public List<Contract> getContracts(long start, long end) throws IOException {
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/contract?columns=" + getContractColumns() + "&limit=50000&row_id.gte=" + start
+                            + "&row_id.lte=" + end);
+            return convertJsonList(json, Contract.class, new TypeReference<List<Contract>>() {
+            }, new ContractTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get contracts between " + start + " and " + end);
+        }
+    }
+
+    /**
+     * Get the most recent contract
+     *
+     * @return last contract
+     * @throws IOException if contract failed to retrieve
+     */
+    public Contract getLastContract() throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/contract?columns=" + getContractColumns()
+                    + "&limit=1&order=desc");
+            List<Contract> contracts = convertJsonList(json, Contract.class, new TypeReference<List<Contract>>() {
+            }, new ContractTableDeserializer());
+            if (contracts.isEmpty())
+                throw new IOException("Failed to get last contract");
+            return contracts.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get last contract");
+        }
     }
 
     /**
