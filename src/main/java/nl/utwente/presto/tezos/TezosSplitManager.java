@@ -11,8 +11,11 @@ import nl.utwente.presto.tezos.tezos.TezosClientProvider;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static nl.utwente.presto.tezos.handle.TezosHandleResolver.convertLayout;
@@ -50,65 +53,40 @@ public class TezosSplitManager implements ConnectorSplitManager {
         TezosTable table = TezosTable.valueOf(tableLayoutHandle.getTable().getTableName().toUpperCase());
 
         try {
-            long lastBlockNumber = tezosClient.getLastBlock().getHeight();
-            log.info("current block number: " + lastBlockNumber);
-
-            List<ConnectorSplit> connectorSplits;
+            long lastId;
+            BiFunction<Long, Long, List<ConnectorSplit>> converter;
             switch (table) {
                 case BLOCK:
-                    if (tableLayoutHandle.getRanges().isEmpty()) {
-                        connectorSplits = LongStream.range(0, lastBlockNumber + 1)
-                                .mapToObj(TezosSplit::forBlock)
-                                .collect(Collectors.toList());
-                    } else {
-                        connectorSplits = tableLayoutHandle.getRanges()
-                                .stream()
-                                .flatMap(blockRange -> LongStream.range(
-                                        blockRange.getStart(),
-                                        blockRange.getEnd() == -1 ? lastBlockNumber : blockRange.getEnd() + 1).boxed())
-                                .map(TezosSplit::forBlock)
-                                .collect(Collectors.toList());
-                    }
-
-                    log.info("Built %d splits", connectorSplits.size());
-                    return new FixedSplitSource(connectorSplits);
+                    lastId = tezosClient.getLastBlock().getHeight();
+                    converter = TezosSplit::forBlockRange;
+                    break;
                 case ELECTION:
-                    long lastElection = tezosClient.getLastElection().getRowId();
-                    if (tableLayoutHandle.getRanges().isEmpty()) {
-                        connectorSplits = LongStream.range(0, lastElection + 1)
-                                .mapToObj(TezosSplit::forElection)
-                                .collect(Collectors.toList());
-                    } else {
-                        connectorSplits = tableLayoutHandle.getRanges()
-                                .stream()
-                                .flatMap(blockRange -> LongStream.range(
-                                        blockRange.getStart(),
-                                        blockRange.getEnd() == -1 ? lastElection : blockRange.getEnd() + 1).boxed())
-                                .map(TezosSplit::forElection)
-                                .collect(Collectors.toList());
-                    }
-                    log.info("Built %d splits", connectorSplits.size());
-                    return new FixedSplitSource(connectorSplits);
+                    lastId = tezosClient.getLastElection().getRowId();
+                    converter = TezosSplit::forElectionRange;
+                    break;
                 case PROPOSAL:
-                    long lastProposal = tezosClient.getLastProposal().getRowId();
-                    if (tableLayoutHandle.getRanges().isEmpty()) {
-                        connectorSplits = LongStream.range(0, lastProposal + 1)
-                                .mapToObj(TezosSplit::forProposal)
-                                .collect(Collectors.toList());
-                    } else {
-                        connectorSplits = tableLayoutHandle.getRanges()
-                                .stream()
-                                .flatMap(blockRange -> LongStream.range(
-                                        blockRange.getStart(),
-                                        blockRange.getEnd() == -1 ? lastProposal : blockRange.getEnd() + 1).boxed())
-                                .map(TezosSplit::forProposal)
-                                .collect(Collectors.toList());
-                    }
-                    log.info("Built %d splits", connectorSplits.size());
-                    return new FixedSplitSource(connectorSplits);
+                    lastId = tezosClient.getLastProposal().getRowId();
+                    converter = TezosSplit::forProposalRange;
+                    break;
                 default:
                     throw new RuntimeException("Cannot make a split from this range");
             }
+
+            List<ConnectorSplit> connectorSplits;
+            if (tableLayoutHandle.getRanges().isEmpty()) {
+                connectorSplits = converter.apply(0L, lastId + 1);
+            } else {
+                connectorSplits = tableLayoutHandle.getRanges()
+                        .stream()
+                        .flatMap(range -> converter.apply(
+                                range.getStart(),
+                                range.getEnd() == -1 ? lastId : range.getEnd() + 1).stream()
+                        )
+                        .collect(Collectors.toList());
+            }
+
+            log.info("Built %d splits", connectorSplits.size());
+            return new FixedSplitSource(connectorSplits);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Cannot get block number: ", e);
