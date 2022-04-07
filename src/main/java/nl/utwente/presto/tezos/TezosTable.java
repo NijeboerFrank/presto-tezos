@@ -9,6 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TezosTable {
     BLOCK("block"),
+    CONTRACT("contract"),
     OPERATION("operation"),
     PROPOSAL("proposal"),
     ELECTION("election");

@@ -46,8 +46,9 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Create new splits for a range of blocks
+     * 
      * @param blockIdStart lower bound block height (ID)
-     * @param blockIdEnd upper bound block height (ID)
+     * @param blockIdEnd   upper bound block height (ID)
      * @return new splits
      */
     public static List<ConnectorSplit> forBlockRange(long blockIdStart, long blockIdEnd) {
@@ -56,8 +57,9 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Create new splits for a range of elections
+     * 
      * @param electionIdStart lower bound election ID
-     * @param electionIdEnd upper bound election ID
+     * @param electionIdEnd   upper bound election ID
      * @return new splits
      */
     public static List<ConnectorSplit> forElectionRange(long electionIdStart, long electionIdEnd) {
@@ -66,8 +68,9 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Create new splits for a range of proposals
+     * 
      * @param proposalIdStart lower bound proposal ID
-     * @param proposalIdEnd upper bound proposal ID
+     * @param proposalIdEnd   upper bound proposal ID
      * @return new splits
      */
     public static List<ConnectorSplit> forProposalRange(long proposalIdStart, long proposalIdEnd) {
@@ -79,11 +82,23 @@ public class TezosSplit implements ConnectorSplit {
     }
 
     /**
+     * Create new splits for a range of contracts
+     * 
+     * @param contractIdStart lower bound contract ID
+     * @param contractIdEnd   upper bound contract ID
+     * @return new splits
+     */
+    public static List<ConnectorSplit> forContractRange(long contractIdStart, long contractIdEnd) {
+        return forRange(contractIdStart, contractIdEnd, TezosTable.CONTRACT, Type.CONTRACT_RANGE);
+    }
+
+    /**
      * Create new splits for a range of IDs
+     * 
      * @param rangeStart lower bound ID
-     * @param rangeEnd upper bound ID
-     * @param table split table
-     * @param type split type
+     * @param rangeEnd   upper bound ID
+     * @param table      split table
+     * @param type       split type
      * @return new splits
      */
     private static List<ConnectorSplit> forRange(long rangeStart, long rangeEnd, TezosTable table, Type type) {
@@ -93,8 +108,7 @@ public class TezosSplit implements ConnectorSplit {
             splits.add(new TezosSplit(
                     table,
                     type,
-                    ImmutableList.of(start, Math.min(rangeEnd, start + 49999))
-            ));
+                    ImmutableList.of(start, Math.min(rangeEnd, start + 49999))));
             start += 50000;
         }
         return splits;
@@ -118,6 +132,10 @@ public class TezosSplit implements ConnectorSplit {
      */
     public static TezosSplit forElection(long electionId) {
         return new TezosSplit(TezosTable.ELECTION, Type.ELECTION, electionId);
+    }
+
+    public static TezosSplit forContract(long contractId) {
+        return new TezosSplit(TezosTable.CONTRACT, Type.CONTRACT, contractId);
     }
 
     /**
@@ -174,73 +192,111 @@ public class TezosSplit implements ConnectorSplit {
 
     /**
      * Get lower bound block height (ID) of range
+     * 
      * @return block height (ID)
      */
     public long getBlockStartId() {
-        if (type != Type.BLOCK_RANGE) throw new IllegalArgumentException();
+        if (type != Type.BLOCK_RANGE)
+            throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(0).toString());
     }
 
     /**
      * Get upper bound block height (ID) of range
+     * 
      * @return block height (ID)
      */
     public long getBlockEndId() {
-        if (type != Type.BLOCK_RANGE) throw new IllegalArgumentException();
+        if (type != Type.BLOCK_RANGE)
+            throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(1).toString());
     }
 
     /**
      * Get lower bound election ID of range
+     * 
      * @return election ID
      */
     public long getElectionStartId() {
-        if (type != Type.ELECTION_RANGE) throw new IllegalArgumentException();
+        if (type != Type.ELECTION_RANGE)
+            throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(0).toString());
     }
 
     /**
      * Get upper bound election ID of range
+     * 
      * @return election ID
      */
     public long getElectionEndId() {
-        if (type != Type.ELECTION_RANGE) throw new IllegalArgumentException();
+        if (type != Type.ELECTION_RANGE)
+            throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(1).toString());
     }
 
     /**
      * Get lower bound proposal ID of range
+     * 
      * @return proposal ID
      */
     public long getProposalStartId() {
-        if (type != Type.PROPOSAL_RANGE) throw new IllegalArgumentException();
+        if (type != Type.PROPOSAL_RANGE)
+            throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(0).toString());
     }
 
     /**
      * Get upper bound proposal ID of range
+     * 
      * @return proposal ID
      */
     public long getProposalEndId() {
-        if (type != Type.PROPOSAL_RANGE) throw new IllegalArgumentException();
+        if (type != Type.PROPOSAL_RANGE)
+            throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(1).toString());
     }
 
     /**
      * Get upper bound operation ID of range
+     * 
      * @return operation ID
      */
     public long getOperationStartId() {
-        if (type != Type.OPERATION_RANGE) throw new IllegalArgumentException();
+        if (type != Type.OPERATION_RANGE)
+            throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(0).toString());
     }
 
     /**
+     * Get lower bound contract ID of range
+     * 
+     * @return contract ID
+     */
+    public long getContractStartId() {
+        if (type != Type.CONTRACT_RANGE)
+            throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(0).toString());
+    }
+
+    /**
+     * Get upper bound contract ID of range
+     * 
+     * @return contract ID
+     */
+    public long getContractEndId() {
+        if (type != Type.CONTRACT_RANGE)
+            throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(1).toString());
+    }
+
+    /**
      * Get lower bound operation ID of range
+     * 
      * @return operation ID
      */
     public long getOperationEndId() {
-        if (type != Type.OPERATION_RANGE) throw new IllegalArgumentException();
+        if (type != Type.OPERATION_RANGE)
+            throw new IllegalArgumentException();
         return Long.parseLong(((List) value).get(1).toString());
     }
 
@@ -280,6 +336,12 @@ public class TezosSplit implements ConnectorSplit {
         return Long.parseLong(value.toString());
     }
 
+    public long getContractId() {
+        if (type != Type.CONTRACT)
+            throw new IllegalArgumentException();
+        return Long.parseLong(value.toString());
+    }
+
     @Override
     public NodeSelectionStrategy getNodeSelectionStrategy() {
         return NodeSelectionStrategy.NO_PREFERENCE;
@@ -305,6 +367,8 @@ public class TezosSplit implements ConnectorSplit {
         ELECTION_RANGE,
         PROPOSAL,
         PROPOSAL_RANGE,
+        CONTRACT,
+        CONTRACT_RANGE,
         OPERATION,
         OPERATION_RANGE,
     }

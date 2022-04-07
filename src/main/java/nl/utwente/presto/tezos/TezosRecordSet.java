@@ -7,10 +7,12 @@ import com.google.common.collect.ImmutableList;
 
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.recordCursor.TezosBlockRecordCursor;
+import nl.utwente.presto.tezos.recordCursor.TezosContractRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosElectionRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosOperationRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosProposalRecordCursor;
 import nl.utwente.presto.tezos.tezos.Block;
+import nl.utwente.presto.tezos.tezos.Contract;
 import nl.utwente.presto.tezos.tezos.Election;
 import nl.utwente.presto.tezos.tezos.Operation;
 import nl.utwente.presto.tezos.tezos.Proposal;
@@ -94,6 +96,20 @@ public class TezosRecordSet implements RecordSet {
                     e.printStackTrace();
                 }
                 return new TezosProposalRecordCursor(columnHandles, proposals, split.getTable());
+            case CONTRACT:
+                List<Contract> contracts = null;
+                try {
+                    switch (split.getType()) {
+                        case CONTRACT:
+                            contracts = ImmutableList.of(tezosClient.getContract(split.getContractId()));
+                            break;
+                        case CONTRACT_RANGE:
+                            contracts = tezosClient.getContracts(split.getContractStartId(), split.getContractEndId());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return new TezosContractRecordCursor(columnHandles, contracts, split.getTable());
             case OPERATION:
                 List<Operation> operations = null;
                 try {

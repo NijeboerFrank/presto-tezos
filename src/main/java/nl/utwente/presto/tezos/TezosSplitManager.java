@@ -36,7 +36,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
 
     /**
      * Convert list of block ranges to a list of splits
-     * 
+     *
      * @param transaction
      * @param session
      * @param layout                 table layout and block ranges
@@ -67,6 +67,10 @@ public class TezosSplitManager implements ConnectorSplitManager {
                 case PROPOSAL:
                     lastId = tezosClient.getLastProposal().getRowId();
                     converter = TezosSplit::forProposalRange;
+                    break;
+                case CONTRACT:
+                    lastId = tezosClient.getLastContract().getRowId();
+                    converter = TezosSplit::forContractRange;
                     break;
                 case OPERATION:
                     lastId  = tezosClient.getLastOperation().getHeight();

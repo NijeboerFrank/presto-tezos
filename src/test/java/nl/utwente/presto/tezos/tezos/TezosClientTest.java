@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TezosClientTest {
     /**
@@ -36,6 +35,12 @@ public class TezosClientTest {
         assertTrue(block.stream().anyMatch(b -> b.getHeight() == 1));
         assertTrue(block.stream().anyMatch(b -> b.getHeight() == 2));
     }
+    @Test
+    public void testContract() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Contract contract = tezosClient.getContract("KT1Puc9St8wdNoGtLiD2WXaHbWU7styaxYhD");
+        assertEquals(818425L, contract.getAccountId());
+    }
 
     /**
      * Requests multiple operations at height 1 and 2, and checks if the hash is
@@ -58,6 +63,12 @@ public class TezosClientTest {
         assertTrue(operation.getRowId() == 65537);
     }
 
+    @Test
+    public void testLastContract() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Contract contract = tezosClient.getLastContract();
+        assertNotNull(contract);
+    }
     @Test
     public void testElections() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");

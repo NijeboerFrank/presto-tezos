@@ -60,6 +60,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                 List<Range> orderedRanges = entry.getValue().getValues().getRanges().getOrderedRanges();
 
                 switch (columnName) {
+                    case "contract_id":
                     case "block_height":
                     case "election_id":
                     case "proposal_id":
@@ -79,7 +80,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                                 .filter(Range::isSingleValue).forEach(r -> {
                                     String blockHash = ((Slice) r.getSingleValue()).toStringUtf8();
                                     try {
-                                        long blockNumber = tezosClient.getBlock(blockHash).getNumber().longValue();
+                                        long blockNumber = tezosClient.getBlock(blockHash).getHeight();
                                         builder.add(new TezosRange(columnName, blockNumber, blockNumber));
                                     } catch (IOException e) {
                                         throw new IllegalStateException("Unable to getting block by hash " + blockHash);
@@ -214,6 +215,24 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("election_noMajority", BooleanType.BOOLEAN));
             builder.add(new Pair<>("election_proposal", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("election_lastVotingPeriod", VarcharType.createUnboundedVarcharType()));
+        } else if (TezosTable.CONTRACT.getName().equals(table)) {
+            builder.add(new Pair<>("contract_id", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_address", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_accountId", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_creatorId", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_firstSeen", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_lastSeen", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_storageSize", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_storagePaid", BigintType.BIGINT));
+            builder.add(new Pair<>("contract_script", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_storage", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_ifaceHash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_codeHash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_storageHash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_callStats", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_features", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_interfaces", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("contract_creator", VarcharType.createUnboundedVarcharType()));
         } else if (TezosTable.PROPOSAL.getName().equals(table)) {
             builder.add(new Pair<>("proposal_id", BigintType.BIGINT));
             builder.add(new Pair<>("proposal_hash", VarcharType.createUnboundedVarcharType()));

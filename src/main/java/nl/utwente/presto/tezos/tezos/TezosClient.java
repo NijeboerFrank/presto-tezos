@@ -100,16 +100,19 @@ public class TezosClient {
 
     /**
      * Retrieve blocks in a range
+     * 
      * @param start lower bound block height (ID)
-     * @param end upper bound block height (ID)
+     * @param end   upper bound block height (ID)
      * @return blocks
      * @throws IOException if blocks failed to retrieve
      */
     public List<Block> getBlocks(long start, long end) throws IOException {
         try {
             String json = doGetRequest(
-                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.gte=" + start + "&height.lte=" + end);
-            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {}, new BlockTableDeserializer());
+                    endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.gte=" + start
+                            + "&height.lte=" + end);
+            return convertJsonList(json, Block.class, new TypeReference<List<Block>>() {
+            }, new BlockTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get blocks between " + start + " and " + end);
@@ -133,6 +136,10 @@ public class TezosClient {
      */
     private String getBlocksColumns() {
         return "hash,predecessor,baker,height,cycle,is_cycle_snapshot,time,solvetime,version,round,nonce,voting_period_kind,n_endorsed_slots,n_ops_applied,n_ops_failed,volume,fee,reward,deposit,activated_supply,burned_supply,n_accounts,n_new_accounts,n_new_contracts,n_cleared_accounts,n_funded_accounts,gas_limit,gas_used,storage_paid,pct_account_reuse,n_events,lb_esc_vote,lb_esc_ema";
+    }
+
+    private String getContractColumns() {
+        return "row_id,address,account_id,creator_id,first_seen,last_seen,storage_size,storage_paid,script,storage,iface_hash,code_hash,storage_hash,call_stats,features,interfaces,creator";
     }
 
     /**
@@ -288,16 +295,19 @@ public class TezosClient {
 
     /**
      * Retrieve elections in a range
+     * 
      * @param start lower bound election ID
-     * @param end upper bound election ID
+     * @param end   upper bound election ID
      * @return elections
      * @throws IOException if elections failed to retrieve
      */
     public List<Election> getElections(long start, long end) throws IOException {
         try {
             String json = doGetRequest(
-                    endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id.gte=" + start + "&row_id.lte=" + end);
-            return convertJsonList(json, Election.class, new TypeReference<List<Election>>() {}, new ElectionTableDeserializer());
+                    endpoint + "/tables/election?columns=" + getElectionColumns() + "&limit=50000&row_id.gte=" + start
+                            + "&row_id.lte=" + end);
+            return convertJsonList(json, Election.class, new TypeReference<List<Election>>() {
+            }, new ElectionTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get elections between " + start + " and " + end);
@@ -358,16 +368,19 @@ public class TezosClient {
 
     /**
      * Retrieve proposals in a range
+     * 
      * @param start lower bound proposal ID
-     * @param end upper bound proposal ID
+     * @param end   upper bound proposal ID
      * @return proposals
      * @throws IOException if proposals failed to retrieve
      */
     public List<Proposal> getProposals(long start, long end) throws IOException {
         try {
             String json = doGetRequest(
-                    endpoint + "/tables/proposal?columns=" + getProposalColumns() + "&limit=50000&row_id.gte=" + start + "&row_id.lte=" + end);
-            return convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {}, new ProposalTableDeserializer());
+                    endpoint + "/tables/proposal?columns=" + getProposalColumns() + "&limit=50000&row_id.gte=" + start
+                            + "&row_id.lte=" + end);
+            return convertJsonList(json, Proposal.class, new TypeReference<List<Proposal>>() {
+            }, new ProposalTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get proposals between " + start + " and " + end);
@@ -402,6 +415,95 @@ public class TezosClient {
      */
     private String getProposalColumns() {
         return "row_id,hash,height,time,source_id,op_id,election_id,voting_period,rolls,voters,source,op";
+    }
+
+
+
+    /**
+     * Get contract by its ID
+     *
+     * @param contractId ID of contract to retrieve
+     * @return contract
+     * @throws IOException if contract failed to retrieve
+     */
+    public Contract getContract(long contractId) throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/contract?columns=" + getContractColumns()
+                    + "&limit=50000&row_id=" + contractId);
+            List<Contract> contracts = convertJsonList(json, Contract.class, new TypeReference<List<Contract>>() {
+            }, new ContractTableDeserializer());
+            if (contracts.isEmpty())
+                throw new IOException("Failed to get contract" + contractId);
+            return contracts.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get contract " + contractId);
+        }
+    }
+
+    /**
+     * Get contract by its Hash
+     *
+     * @param hash hash of contract we want to retrieve
+     * @return contract
+     * @throws IOException if contract failed to retrieve
+     */
+    public Contract getContract(String hash) throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/contract?columns=" + getContractColumns()
+                    + "&limit=50000&address=" + hash);
+            List<Contract> contracts = convertJsonList(json, Contract.class, new TypeReference<List<Contract>>() {
+            }, new ContractTableDeserializer());
+            if (contracts.isEmpty())
+                throw new IOException("Failed to get contract" + hash);
+            return contracts.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get contract " + hash);
+        }
+    }
+
+
+    /**
+     * Retrieve contracts in a range
+     *
+     * @param start lower bound contract ID
+     * @param end   upper bound contract ID
+     * @return contracts
+     * @throws IOException if contracts failed to retrieve
+     */
+    public List<Contract> getContracts(long start, long end) throws IOException {
+        try {
+            String json = doGetRequest(
+                    endpoint + "/tables/contract?columns=" + getContractColumns() + "&limit=50000&row_id.gte=" + start
+                            + "&row_id.lte=" + end);
+            return convertJsonList(json, Contract.class, new TypeReference<List<Contract>>() {
+            }, new ContractTableDeserializer());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get contracts between " + start + " and " + end);
+        }
+    }
+
+    /**
+     * Get the most recent contract
+     *
+     * @return last contract
+     * @throws IOException if contract failed to retrieve
+     */
+    public Contract getLastContract() throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/contract?columns=" + getContractColumns()
+                    + "&limit=1&order=desc");
+            List<Contract> contracts = convertJsonList(json, Contract.class, new TypeReference<List<Contract>>() {
+            }, new ContractTableDeserializer());
+            if (contracts.isEmpty())
+                throw new IOException("Failed to get last contract");
+            return contracts.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get last contract");
+        }
     }
 
     /**

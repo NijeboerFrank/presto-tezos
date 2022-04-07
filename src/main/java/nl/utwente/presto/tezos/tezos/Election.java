@@ -28,8 +28,4 @@ public class Election {
     private boolean nonMajority;
     private String proposal;
     private String lastVotingPeriod;
-
-    public Election getElection() {
-        return this;
-    }
 }

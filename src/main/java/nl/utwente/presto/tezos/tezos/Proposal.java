@@ -24,8 +24,4 @@ public class Proposal {
     long voters;
     String source;
     String op;
-
-    public Proposal getProposal() {
-        return this;
-    }
 }
