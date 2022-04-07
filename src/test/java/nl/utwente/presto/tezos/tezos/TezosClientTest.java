@@ -50,4 +50,33 @@ public class TezosClientTest {
         assertTrue(operations.stream()
                 .anyMatch(b -> b.getHash().equals("oneDGhZacw99EEFaYDTtWfz5QEhUW3PPVFsHa7GShnLPuDn7gSd")));
     }
+
+    @Test
+    public void testElections() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        List<Election> elections = tezosClient.getElections(new long[] { 1, 3 });
+        assertTrue(elections.stream().anyMatch(b -> b.getRowId() == 1));
+        assertTrue(elections.stream().anyMatch(b -> b.getRowId() == 3));
+    }
+
+    @Test
+    public void testElection() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Election election = tezosClient.getElection(1);
+        assertTrue(election.getRowId() == 1);
+    }
+
+    @Test
+    public void testLastElection() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Election election = tezosClient.getLastElection();
+        assertTrue(election.getRowId() > 37);
+    }
+
+    @Test
+    public void testProposal() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Proposal proposal = tezosClient.getProposal(1);
+        assertTrue(proposal.getRowId() == 1);
+    }
 }

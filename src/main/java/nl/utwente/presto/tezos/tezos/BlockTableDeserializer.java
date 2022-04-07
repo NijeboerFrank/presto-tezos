@@ -30,28 +30,12 @@ public class BlockTableDeserializer extends JsonDeserializer<Block> {
                 iterator.next().asText(), // time
                 iterator.next().asLong(), // solvetime
                 iterator.next().asLong(), // version
-                iterator.next().asLong(), // fitness
-                iterator.next().asLong(), // priority
+                iterator.next().asLong(), // round
                 iterator.next().asText(), // nonce
                 iterator.next().asText(), // voting_period_kind
-                iterator.next().asText(), // slot_mask
                 iterator.next().asLong(), // n_endorsed_slots
-                iterator.next().asLong(), // n_ops
+                iterator.next().asLong(), // n_ops_applied
                 iterator.next().asLong(), // n_ops_failed
-                iterator.next().asLong(), // n_ops_contract
-                iterator.next().asLong(), // n_contract_calls
-                iterator.next().asLong(), // n_tx
-                iterator.next().asLong(), // n_activation
-                iterator.next().asLong(), // n_seed_nonce_revelation
-                iterator.next().asLong(), // n_double_baking_evidence
-                iterator.next().asLong(), // n_double_endorsement_evidence
-                iterator.next().asLong(), // n_endorsement
-                iterator.next().asLong(), // n_delegation
-                iterator.next().asLong(), // n_reveal
-                iterator.next().asLong(), // n_origination
-                iterator.next().asLong(), // n_proposal
-                iterator.next().asLong(), // n_ballot
-                iterator.next().asLong(), // n_register_constant
                 iterator.next().asDouble(), // volume
                 iterator.next().asDouble(), // fee
                 iterator.next().asDouble(), // reward
@@ -65,11 +49,9 @@ public class BlockTableDeserializer extends JsonDeserializer<Block> {
                 iterator.next().asLong(), // n_funded_accounts
                 iterator.next().asLong(), // gas_limit
                 iterator.next().asLong(), // gas_used
-                iterator.next().asDouble(), // gas_price
-                iterator.next().asLong(), // storage_size
-                iterator.next().asDouble(), // days_destroyed
+                iterator.next().asLong(), // storage_paid
                 iterator.next().asDouble(), // pct_account_reuse
-                iterator.next().asLong(), // n_ops_implicit
+                iterator.next().asLong(), // n_events
                 iterator.next().asBoolean(), // lb_esc_vote
                 iterator.next().asLong() // lb_esc_ema
         );

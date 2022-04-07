@@ -5,7 +5,12 @@ import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
 import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
+import nl.utwente.presto.tezos.recordCursor.TezosBlockRecordCursor;
+import nl.utwente.presto.tezos.recordCursor.TezosElectionRecordCursor;
+import nl.utwente.presto.tezos.recordCursor.TezosProposalRecordCursor;
 import nl.utwente.presto.tezos.tezos.Block;
+import nl.utwente.presto.tezos.tezos.Election;
+import nl.utwente.presto.tezos.tezos.Proposal;
 import nl.utwente.presto.tezos.tezos.TezosClient;
 
 import java.io.IOException;
@@ -41,12 +46,35 @@ public class TezosRecordSet implements RecordSet {
 
     @Override
     public RecordCursor cursor() {
-        Block block = null; //TODO change to block! name problem from!
-        try {
-            block = tezosClient.getBlock(split.getBlockId());
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        switch (split.getTable()) {
+            case BLOCK:
+                Block block = null;
+                try {
+                    block = tezosClient.getBlock(split.getBlockId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return new TezosBlockRecordCursor(columnHandles, block, split.getTable(), tezosClient);
+            case ELECTION:
+                Election election = null;
+                try {
+                    // TODO Also get election by proposal ID
+                    election = tezosClient.getElection(split.getElectionId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return new TezosElectionRecordCursor(columnHandles, election, split.getTable(), tezosClient);
+            case PROPOSAL:
+                Proposal proposal = null;
+                try {
+                    proposal = tezosClient.getProposal(split.getProposalId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return new TezosProposalRecordCursor(columnHandles, proposal, split.getTable(), tezosClient);
+            default:
+                return null;
         }
-        return new TezosRecordCursor(columnHandles, block, split.getTable(), tezosClient);
     }
 }

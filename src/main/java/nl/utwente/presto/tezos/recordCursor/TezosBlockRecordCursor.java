@@ -1,7 +1,9 @@
-package nl.utwente.presto.tezos;
+package nl.utwente.presto.tezos.recordCursor;
 
 import com.google.common.collect.ImmutableList;
 import io.airlift.log.Logger;
+import nl.utwente.presto.tezos.TezosMetadata;
+import nl.utwente.presto.tezos.TezosTable;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.tezos.Block;
 import nl.utwente.presto.tezos.tezos.TezosClient;
@@ -12,15 +14,15 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
-public class TezosRecordCursor extends BaseTezosRecordCursor {
-    private static final Logger log = Logger.get(TezosRecordCursor.class);
+public class TezosBlockRecordCursor extends BaseTezosRecordCursor {
+    private static final Logger log = Logger.get(TezosBlockRecordCursor.class);
 
     private final Block block;
     private final Iterator<Block> blockIter;
 
     private final TezosTable table;
 
-    public TezosRecordCursor(List<TezosColumnHandle> columnHandles, Block block, TezosTable table,
+    public TezosBlockRecordCursor(List<TezosColumnHandle> columnHandles, Block block, TezosTable table,
             TezosClient tezosClient) {
         super(columnHandles);
 
@@ -55,28 +57,12 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             builder.add(block::getTimestampMillis);
             builder.add(block::getSolvetime);
             builder.add(block::getVersion);
-            builder.add(block::getFitness);
-            builder.add(block::getPriority);
+            builder.add(block::getRound);
             builder.add(block::getNonce);
             builder.add(block::getVotingPeriodKind);
-            builder.add(block::getSlotMask);
             builder.add(block::getNEndorsedSlots);
-            builder.add(block::getNOps);
+            builder.add(block::getNOpsApplied);
             builder.add(block::getNOpsFailed);
-            builder.add(block::getNOpsContract);
-            builder.add(block::getNContractCalls);
-            builder.add(block::getNTx);
-            builder.add(block::getNActivation);
-            builder.add(block::getNSeedNonceRevelations);
-            builder.add(block::getNDoubleBakingEvidences);
-            builder.add(block::getNDoubleEndorsementEvidences);
-            builder.add(block::getNEndorsement);
-            builder.add(block::getNDelegation);
-            builder.add(block::getNReveal);
-            builder.add(block::getNOrigination);
-            builder.add(block::getNProposal);
-            builder.add(block::getNBallot);
-            builder.add(block::getNRegisterConstant);
             builder.add(block::getVolume);
             builder.add(block::getFee);
             builder.add(block::getReward);
@@ -90,16 +76,11 @@ public class TezosRecordCursor extends BaseTezosRecordCursor {
             builder.add(block::getNFundedAccounts);
             builder.add(block::getGasLimit);
             builder.add(block::getGasUsed);
-            builder.add(block::getGasPrice);
-            builder.add(block::getStorageSize);
-            builder.add(block::getDaysDestroyed);
+            builder.add(block::getStoragePaid);
             builder.add(block::getPctAccountReuse);
-            builder.add(block::getNOpsImplicit);
+            builder.add(block::getNEvents);
             builder.add(block::isLbEscVote);
             builder.add(block::getLbEscEma);
-
-        } else if (table == TezosTable.OPERATION) {
-            // TODO for operation
         } else {
             return false;
         }

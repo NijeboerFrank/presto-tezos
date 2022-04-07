@@ -52,7 +52,7 @@ public class TezosMetadata extends BaseTezosMetadata {
             ConnectorTableHandle table,
             Constraint<ColumnHandle> constraint,
             Optional<Set<ColumnHandle>> desiredColumns) {
-        ImmutableList.Builder<TezosBlockRange> builder = ImmutableList.builder();
+        ImmutableList.Builder<TezosRange> builder = ImmutableList.builder();
 
         Optional<Map<ColumnHandle, Domain>> domains = constraint.getSummary().getDomains();
         if (domains.isPresent()) {
@@ -66,11 +66,13 @@ public class TezosMetadata extends BaseTezosMetadata {
 
                 switch (columnName) {
                     case "block_height":
+                    case "election_id":
+                    case "proposal_id":
                         // Limit query to block number range
                         orderedRanges.forEach(r -> {
                             Marker low = r.getLow();
                             Marker high = r.getHigh();
-                            builder.add(TezosBlockRange.fromMarkers(low, high));
+                            builder.add(TezosRange.fromMarkers(columnName, low, high));
                         });
                         break;
                     case "block_hash":
@@ -81,7 +83,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                                     String blockHash = ((Slice) r.getSingleValue()).toStringUtf8();
                                     try {
                                         long blockNumber = tezosClient.getBlock(blockHash).getNumber().longValue();
-                                        builder.add(new TezosBlockRange(blockNumber, blockNumber));
+                                        builder.add(new TezosRange(columnName, blockNumber, blockNumber));
                                     } catch (IOException e) {
                                         throw new IllegalStateException("Unable to getting block by hash " + blockHash);
                                     }
@@ -98,7 +100,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                                         : findBlockByTimestamp((Long) low.getValue(), -1L);
                                 long endBlock = high.isUpperUnbounded() ? -1L
                                         : findBlockByTimestamp((Long) high.getValue(), 1L);
-                                builder.add(new TezosBlockRange(startBlock, endBlock));
+                                builder.add(new TezosRange(columnName, startBlock, endBlock));
                             } catch (IOException e) {
                                 throw new IllegalStateException("Unable to find block by timestamp");
                             }
@@ -136,28 +138,12 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_time", TimestampType.TIMESTAMP));
             builder.add(new Pair<>("block_solvetime", BigintType.BIGINT));
             builder.add(new Pair<>("block_version", BigintType.BIGINT));
-            builder.add(new Pair<>("block_fitness", BigintType.BIGINT));
-            builder.add(new Pair<>("block_priority", BigintType.BIGINT));
+            builder.add(new Pair<>("block_round", BigintType.BIGINT));
             builder.add(new Pair<>("block_nonce", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("block_votingPeriodKind", VarcharType.createUnboundedVarcharType()));
-            builder.add(new Pair<>("block_slotMask", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("block_nEndorsedSlots", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nOps", BigintType.BIGINT));
+            builder.add(new Pair<>("block_nOpsApplied", BigintType.BIGINT));
             builder.add(new Pair<>("block_nOpsFailed", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nOpsContract", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nContractCalls", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nTx", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nActivation", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nSeedNonceRevelations", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nDoubleBakingEvidences", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nDoubleEndorsementEvidences", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nEndorsement", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nDelegation", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nReveal", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nOrigination", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nProposal", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nBallot", BigintType.BIGINT));
-            builder.add(new Pair<>("block_nRegisterConstant", BigintType.BIGINT));
             builder.add(new Pair<>("block_volume", DoubleType.DOUBLE));
             builder.add(new Pair<>("block_fee", DoubleType.DOUBLE));
             builder.add(new Pair<>("block_reward", DoubleType.DOUBLE));
@@ -171,11 +157,9 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("block_nFundedAccounts", BigintType.BIGINT));
             builder.add(new Pair<>("block_gasLimit", BigintType.BIGINT));
             builder.add(new Pair<>("block_gasUsed", BigintType.BIGINT));
-            builder.add(new Pair<>("block_gasPrice", DoubleType.DOUBLE));
-            builder.add(new Pair<>("block_storageSize", BigintType.BIGINT));
-            builder.add(new Pair<>("block_daysDestroyed", DoubleType.DOUBLE));
+            builder.add(new Pair<>("block_storagePaid", BigintType.BIGINT));
             builder.add(new Pair<>("block_pctAccountReuse", DoubleType.DOUBLE));
-            builder.add(new Pair<>("block_nOpsImplicit", BigintType.BIGINT));
+            builder.add(new Pair<>("block_nEvents", BigintType.BIGINT));
             builder.add(new Pair<>("block_lbEscVote", BooleanType.BOOLEAN));
             builder.add(new Pair<>("block_lbEscEma", BigintType.BIGINT));
         } else if (TezosTable.OPERATION.getName().equals(table)) {
@@ -218,6 +202,36 @@ public class TezosMetadata extends BaseTezosMetadata {
             builder.add(new Pair<>("operation_baker", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("operation_block", VarcharType.createUnboundedVarcharType()));
             builder.add(new Pair<>("operation_entrypoint", VarcharType.createUnboundedVarcharType()));
+        } else if (TezosTable.ELECTION.getName().equals(table)) {
+            builder.add(new Pair<>("election_id", BigintType.BIGINT));
+            builder.add(new Pair<>("election_proposalId", BigintType.BIGINT));
+            builder.add(new Pair<>("election_numPeriods", BigintType.BIGINT));
+            builder.add(new Pair<>("election_numProposals", BigintType.BIGINT));
+            builder.add(new Pair<>("election_votingPeriod", BigintType.BIGINT));
+            builder.add(new Pair<>("election_startTime", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("election_endTime", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("election_startHeight", BigintType.BIGINT));
+            builder.add(new Pair<>("election_endHeight", BigintType.BIGINT));
+            builder.add(new Pair<>("election_isEmpty", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_isOpen", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_isFailed", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_noQuorum", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_noMajority", BooleanType.BOOLEAN));
+            builder.add(new Pair<>("election_proposal", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("election_lastVotingPeriod", VarcharType.createUnboundedVarcharType()));
+        } else if (TezosTable.PROPOSAL.getName().equals(table)) {
+            builder.add(new Pair<>("proposal_id", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_hash", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_height", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_time", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_sourceId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_opId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_electionId", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_votingPeriod", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_rolls", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_voters", BigintType.BIGINT));
+            builder.add(new Pair<>("proposal_source", VarcharType.createUnboundedVarcharType()));
+            builder.add(new Pair<>("proposal_op", VarcharType.createUnboundedVarcharType()));
         } else {
             throw new IllegalArgumentException("Unknown Table Name " + table);
         }
@@ -236,7 +250,7 @@ public class TezosMetadata extends BaseTezosMetadata {
         long startBlock = 1L;
         long currentBlock = 0;
         try {
-            currentBlock = tezosClient.getLastBlockNumber();
+            currentBlock = tezosClient.getLastBlock().getHeight();
         } catch (Exception e) {
             e.printStackTrace();
         }
