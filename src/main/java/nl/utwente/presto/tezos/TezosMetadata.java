@@ -214,19 +214,6 @@ public class TezosMetadata extends BaseTezosMetadata {
     }
 
     /**
-     * Gives the names of the different tables
-     * 
-     * @param session
-     * @param schamaNameOrNull
-     * @return List of tables available
-     */
-    @Override
-    public List<SchemaTableName> listTables(ConnectorSession session, String schamaNameOrNull) {
-        return ImmutableList.of(new SchemaTableName(DEFAULT_SCHEMA, TezosTable.BLOCK.getName()),
-                new SchemaTableName(DEFAULT_SCHEMA, TezosTable.CONTRACT.getName()));
-    }
-
-    /**
      * Get the ID of a block that was added at a given timestamp
      * 
      * @param timestamp timestamp of block
