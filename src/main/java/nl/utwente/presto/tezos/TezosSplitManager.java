@@ -55,7 +55,6 @@ public class TezosSplitManager implements ConnectorSplitManager {
         try {
             long lastId;
             BiFunction<Long, Long, List<ConnectorSplit>> converter;
-            log.info("%s", table);
             switch (table) {
                 case BLOCK:
                     lastId = tezosClient.getLastBlock().getHeight();
