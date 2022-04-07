@@ -138,7 +138,7 @@ public class TezosClient {
     /**
      * Get operation by its ID
      * 
-     * @param proposalId ID of operation to retrieve
+     * @param operationId ID of operation to retrieve
      * @return operation
      * @throws IOException if operation failed to retrieve
      */
@@ -187,14 +187,7 @@ public class TezosClient {
         try {
             String json = doGetRequest(
                     endpoint + "/tables/op?columns=" + getOperationsColumns() + "&limit=50000&height.in=" + heightsIn);
-            return new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Operation.class, new OperationTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Operation>>() {
-                    })
-                    .readValue(json);
+            return convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {}, new OperationTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get operations " + heightsIn);
@@ -213,14 +206,7 @@ public class TezosClient {
         try {
             String json = doGetRequest(
                     endpoint + "/tables/op?columns=" + getOperationsColumns() + "&limit=50000&hash.in=" + hashesIn);
-            return new ObjectMapper()
-                    .registerModule(new SimpleModule()
-                            .addDeserializer(Operation.class, new OperationTableDeserializer()))
-                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .reader()
-                    .forType(new TypeReference<List<Operation>>() {
-                    })
-                    .readValue(json);
+            return convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {}, new OperationTableDeserializer());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get blocks " + hashesIn);
