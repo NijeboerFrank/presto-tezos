@@ -22,7 +22,7 @@ public class TezosBlockRecordCursor extends BaseTezosRecordCursor {
 
         this.table = table;
 
-        this.blocks = requireNonNull(blocks, "block is null");
+        this.blocks = requireNonNull(blocks, "blocks is null");
         this.blockIter = blocks.iterator();
     }
 

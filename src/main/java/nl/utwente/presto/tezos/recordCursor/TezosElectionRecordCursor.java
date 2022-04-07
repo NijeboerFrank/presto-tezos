@@ -10,22 +10,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static java.util.Objects.requireNonNull;
+
 public class TezosElectionRecordCursor extends BaseTezosRecordCursor {
     private final Iterator<Election> electionIter;
 
     private final TezosTable table;
 
-    public TezosElectionRecordCursor(List<TezosColumnHandle> columnHandles, Election election, TezosTable table) {
-
+    public TezosElectionRecordCursor(List<TezosColumnHandle> columnHandles, List<Election> elections, TezosTable table) {
         super(columnHandles);
 
         this.table = table;
 
-        if (election != null) {
-            this.electionIter = ImmutableList.of(election).iterator();
-        } else {
-            this.electionIter = Collections.emptyIterator();
-        }
+        this.electionIter = requireNonNull(elections, "elections is null").iterator();
     }
 
     @Override

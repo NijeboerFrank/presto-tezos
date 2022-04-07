@@ -62,21 +62,35 @@ public class TezosRecordSet implements RecordSet {
                 }
                 return new TezosBlockRecordCursor(columnHandles, blocks, split.getTable());
             case ELECTION:
-                Election election = null;
+                List<Election> elections = null;
                 try {
-                    election = tezosClient.getElection(split.getElectionId());
+                    switch (split.getType()) {
+                        case BLOCK:
+                            elections = ImmutableList.of(tezosClient.getElection(split.getBlockId()));
+                            break;
+                        case BLOCK_RANGE:
+                            elections = tezosClient.getElections(split.getElectionStartId(), split.getElectionEndId());
+                            break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return new TezosElectionRecordCursor(columnHandles, election, split.getTable());
+                return new TezosElectionRecordCursor(columnHandles, elections, split.getTable());
             case PROPOSAL:
-                Proposal proposal = null;
+                List<Proposal> proposals = null;
                 try {
-                    proposal = tezosClient.getProposal(split.getProposalId());
+                    switch (split.getType()) {
+                        case BLOCK:
+                            proposals = ImmutableList.of(tezosClient.getProposal(split.getBlockId()));
+                            break;
+                        case BLOCK_RANGE:
+                            proposals = tezosClient.getProposals(split.getProposalStartId(), split.getProposalEndId());
+                            break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return new TezosProposalRecordCursor(columnHandles, proposal, split.getTable());
+                return new TezosProposalRecordCursor(columnHandles, proposals, split.getTable());
             default:
                 return null;
         }

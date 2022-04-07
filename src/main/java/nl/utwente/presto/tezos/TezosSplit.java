@@ -49,13 +49,45 @@ public class TezosSplit implements ConnectorSplit {
      * @return new splits
      */
     public static List<ConnectorSplit> forBlockRange(long blockIdStart, long blockIdEnd) {
-        long start = blockIdStart;
+        return forRange(blockIdStart, blockIdEnd, TezosTable.BLOCK, Type.BLOCK_RANGE);
+    }
+
+    /**
+     * Create new splits for a range of elections
+     * @param blockIdStart lower bound election ID
+     * @param blockIdEnd upper bound election ID
+     * @return new splits
+     */
+    public static List<ConnectorSplit> forElectionRange(long blockIdStart, long blockIdEnd) {
+        return forRange(blockIdStart, blockIdEnd, TezosTable.BLOCK, Type.ELECTION_RANGE);
+    }
+
+    /**
+     * Create new splits for a range of proposals
+     * @param blockIdStart lower bound proposal ID
+     * @param blockIdEnd upper bound proposal ID
+     * @return new splits
+     */
+    public static List<ConnectorSplit> forProposalRange(long blockIdStart, long blockIdEnd) {
+        return forRange(blockIdStart, blockIdEnd, TezosTable.BLOCK, Type.PROPOSAL_RANGE);
+    }
+
+    /**
+     * Create new splits for a range of IDs
+     * @param rangeStart lower bound ID
+     * @param rangeEnd upper bound ID
+     * @param table split table
+     * @param type split type
+     * @return new splits
+     */
+    private static List<ConnectorSplit> forRange(long rangeStart, long rangeEnd, TezosTable table, Type type) {
+        long start = rangeStart;
         List<ConnectorSplit> splits = new ArrayList<>();
-        while (start <= blockIdEnd) { // Max length
+        while (start <= rangeEnd) { // Max length
             splits.add(new TezosSplit(
-                    TezosTable.BLOCK,
-                    Type.BLOCK_RANGE,
-                    ImmutableList.of(start, Math.min(blockIdEnd, start + 49999))
+                    table,
+                    type,
+                    ImmutableList.of(start, Math.min(rangeEnd, start + 49999))
             ));
             start += 50000;
         }
@@ -136,6 +168,44 @@ public class TezosSplit implements ConnectorSplit {
     }
 
     /**
+     * Get lower bound election ID of range
+     * @return election ID
+     */
+    public long getElectionStartId() {
+        if (type != Type.ELECTION_RANGE) throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(0).toString());
+    }
+
+    /**
+     * Get upper bound election ID of range
+     * @return election ID
+     */
+    public long getElectionEndId() {
+        if (type != Type.ELECTION_RANGE) throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(1).toString());
+    }
+
+    /**
+     * Get lower bound proposal ID of range
+     * @return proposal ID
+     */
+    public long getProposalStartId() {
+        if (type != Type.BLOCK_RANGE) throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(0).toString());
+    }
+
+    /**
+     * Get upper bound proposal ID of range
+     * @return proposal ID
+     */
+    public long getProposalEndId() {
+        if (type != Type.BLOCK_RANGE) throw new IllegalArgumentException();
+        return Long.parseLong(((List) value).get(1).toString());
+    }
+
+
+
+    /**
      * Get election id of split
      * @return election id
      * @throws IllegalArgumentException if split type is not for election
@@ -177,6 +247,8 @@ public class TezosSplit implements ConnectorSplit {
         BLOCK,
         BLOCK_RANGE,
         ELECTION,
-        PROPOSAL
+        ELECTION_RANGE,
+        PROPOSAL,
+        PROPOSAL_RANGE
     }
 }
