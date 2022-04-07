@@ -5,8 +5,12 @@ import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
 import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
+import nl.utwente.presto.tezos.recordCursor.TezosBlockRecordCursor;
+import nl.utwente.presto.tezos.recordCursor.TezosElectionRecordCursor;
+import nl.utwente.presto.tezos.recordCursor.TezosProposalRecordCursor;
 import nl.utwente.presto.tezos.tezos.Block;
 import nl.utwente.presto.tezos.tezos.Election;
+import nl.utwente.presto.tezos.tezos.Proposal;
 import nl.utwente.presto.tezos.tezos.TezosClient;
 
 import java.io.IOException;
@@ -61,6 +65,14 @@ public class TezosRecordSet implements RecordSet {
                     e.printStackTrace();
                 }
                 return new TezosElectionRecordCursor(columnHandles, election, split.getTable(), tezosClient);
+            case PROPOSAL:
+                Proposal proposal = null;
+                try {
+                    proposal = tezosClient.getProposal(split.getProposalId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return new TezosProposalRecordCursor(columnHandles, proposal, split.getTable(), tezosClient);
             default:
                 return null;
         }
