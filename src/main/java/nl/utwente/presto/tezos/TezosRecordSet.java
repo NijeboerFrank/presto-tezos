@@ -5,7 +5,6 @@ import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
 import com.google.common.collect.ImmutableList;
 
-import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.recordCursor.TezosBlockRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosElectionRecordCursor;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 
 public class TezosRecordSet implements RecordSet {
-    private static final Logger log = Logger.get(TezosRecordSet.class);
     private final TezosSplit split;
     private final TezosClient tezosClient;
 
@@ -49,9 +47,6 @@ public class TezosRecordSet implements RecordSet {
 
     @Override
     public RecordCursor cursor() {
-
-        log.info("CURSOR");
-        log.info("%s", split.getTable());
 
         switch (split.getTable()) {
             case BLOCK:
@@ -102,13 +97,13 @@ public class TezosRecordSet implements RecordSet {
             case OPERATION:
                 List<Operation> operations = null;
                 try {
-                    log.info("%s", split.getType());
                     switch (split.getType()) {
                         case OPERATION:
                             operations = ImmutableList.of(tezosClient.getOperation(split.getOperationId()));
                             break;
                         case OPERATION_RANGE:
-                            operations = tezosClient.getOperations(split.getOperationStartId(), split.getOperationEndId());
+                            operations = tezosClient.getOperations(split.getOperationStartId(),
+                                    split.getOperationEndId());
                             break;
                     }
                 } catch (IOException e) {

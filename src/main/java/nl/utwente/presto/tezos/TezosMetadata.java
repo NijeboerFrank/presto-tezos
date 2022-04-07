@@ -104,8 +104,6 @@ public class TezosMetadata extends BaseTezosMetadata {
                         });
                         log.info(entry.getValue().getValues().toString(null));
                         break;
-
-                    // TODO for operation
                 }
             }
         }
