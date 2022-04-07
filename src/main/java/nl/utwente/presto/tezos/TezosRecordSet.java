@@ -6,6 +6,7 @@ import com.facebook.presto.spi.RecordSet;
 import com.google.common.collect.ImmutableList;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.recordCursor.TezosBlockRecordCursor;
+import nl.utwente.presto.tezos.recordCursor.TezosContractRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosElectionRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosProposalRecordCursor;
 import nl.utwente.presto.tezos.tezos.Block;

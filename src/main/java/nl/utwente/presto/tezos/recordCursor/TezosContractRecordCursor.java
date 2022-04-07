@@ -1,7 +1,8 @@
-package nl.utwente.presto.tezos;
+package nl.utwente.presto.tezos.recordCursor;
 
 import com.google.common.collect.ImmutableList;
 import io.airlift.log.Logger;
+import nl.utwente.presto.tezos.TezosTable;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.recordCursor.BaseTezosRecordCursor;
 import nl.utwente.presto.tezos.tezos.Contract;
