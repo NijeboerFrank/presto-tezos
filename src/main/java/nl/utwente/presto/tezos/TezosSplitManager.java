@@ -50,7 +50,7 @@ public class TezosSplitManager implements ConnectorSplitManager {
         TezosTable table = TezosTable.valueOf(tableLayoutHandle.getTable().getTableName().toUpperCase());
 
         try {
-            long lastBlockNumber = tezosClient.getLastBlockNumber();
+            long lastBlockNumber = tezosClient.getLastBlock().getHeight();
             log.info("current block number: " + lastBlockNumber);
 
             List<ConnectorSplit> connectorSplits;

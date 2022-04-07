@@ -3,7 +3,7 @@ if [[ "$1" == '' ]] ; then
   exit
 fi
 
-mvn clean package
+mvn clean package -DskipTests
 rm -rf $1/plugin/tezos
 mkdir $1/plugin/tezos
 tar xfz target/presto-tezos-1.0-SNAPSHOT-plugin.tar.gz -C $1/plugin/tezos --strip-components=1
