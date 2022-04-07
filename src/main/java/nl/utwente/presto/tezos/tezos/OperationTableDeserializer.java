@@ -21,6 +21,7 @@ public class OperationTableDeserializer extends JsonDeserializer<Operation> {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         Iterator<JsonNode> iterator = node.elements();
         return new Operation(
+                iterator.next().asLong(), // row_id
                 iterator.next().asText(), // type
                 iterator.next().asText(), // hash
                 iterator.next().asLong(), // heigh

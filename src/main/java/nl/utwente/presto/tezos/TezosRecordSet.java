@@ -7,9 +7,11 @@ import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.recordCursor.TezosBlockRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosElectionRecordCursor;
+import nl.utwente.presto.tezos.recordCursor.TezosOperationRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosProposalRecordCursor;
 import nl.utwente.presto.tezos.tezos.Block;
 import nl.utwente.presto.tezos.tezos.Election;
+import nl.utwente.presto.tezos.tezos.Operation;
 import nl.utwente.presto.tezos.tezos.Proposal;
 import nl.utwente.presto.tezos.tezos.TezosClient;
 
@@ -73,6 +75,14 @@ public class TezosRecordSet implements RecordSet {
                     e.printStackTrace();
                 }
                 return new TezosProposalRecordCursor(columnHandles, proposal, split.getTable(), tezosClient);
+            case OPERATION:
+                Operation operation = null;
+                try {
+                    operation = tezosClient.getOperation(split.getOperationId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return new TezosOperationRecordCursor(columnHandles, operation, split.getTable(), tezosClient);
             default:
                 return null;
         }

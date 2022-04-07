@@ -20,6 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Operation {
+    long rowId;
     private String type;
     private String hash;
     private long height;
@@ -39,25 +40,25 @@ public class Operation {
     @JsonProperty("is_internal")
     private boolean isInternal;
     private long counter;
-    private long gas_limit;
-    private long gas_used;
-    private long storage_limit;
-    private long storage_paid;
+    private long gasLimit;
+    private long gasUsed;
+    private long storageLimit;
+    private long storagePaid;
     private double volume;
     private double fee;
     private double reward;
     private double deposit;
     private double burned;
-    private long sender_id;
-    private long receiver_id;
-    private long manager_id;
-    private long baker_id;
+    private long senderId;
+    private long receiverId;
+    private long managerId;
+    private long bakerId;
     private String data;
     private String parameters;
     private String storage;
-    private String big_map_diff;
+    private String bigMapDiff;
     private String errors;
-    private double days_destroyed;
+    private double daysDestroyed;
     private String sender;
     private String receiver;
     private String creator;

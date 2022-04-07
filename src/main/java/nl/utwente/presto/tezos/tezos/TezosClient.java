@@ -99,6 +99,47 @@ public class TezosClient {
     }
 
     /**
+     * Get the block that was added last
+     * 
+     * @return last block
+     * @throws IOException if block failed to retrieve
+     */
+    public Block getLastBlock() throws IOException {
+        return getBlock("head");
+    }
+
+    /**
+     * Columns of the block table to retrieve from the API
+     * 
+     * @return table columns
+     */
+    private String getBlocksColumns() {
+        return "hash,predecessor,baker,height,cycle,is_cycle_snapshot,time,solvetime,version,round,nonce,voting_period_kind,n_endorsed_slots,n_ops_applied,n_ops_failed,volume,fee,reward,deposit,activated_supply,burned_supply,n_accounts,n_new_accounts,n_new_contracts,n_cleared_accounts,n_funded_accounts,gas_limit,gas_used,storage_paid,pct_account_reuse,n_events,lb_esc_vote,lb_esc_ema";
+    }
+
+    /**
+     * Get operation by its ID
+     * 
+     * @param proposalId ID of operation to retrieve
+     * @return operation
+     * @throws IOException if operation failed to retrieve
+     */
+    public Operation getOperation(long operationId) throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/op?columns=" + getOperationsColumns()
+                    + "&limit=50000&row_id=" + operationId);
+            List<Operation> operations = convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {
+            }, new OperationTableDeserializer());
+            if (operations.isEmpty())
+                throw new IOException("Failed to get operation" + operationId);
+            return operations.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get operation " + operationId);
+        }
+    }
+
+    /**
      * Retrieves operations with the given heights from the API
      * 
      * @param heights list of heights of requested operations
@@ -151,22 +192,24 @@ public class TezosClient {
     }
 
     /**
-     * Get the block that was added last
+     * Get the most recent operation
      * 
-     * @return last block
-     * @throws IOException if block failed to retrieve
+     * @return last operation
+     * @throws IOException if operation failed to retrieve
      */
-    public Block getLastBlock() throws IOException {
-        return getBlock("head");
-    }
-
-    /**
-     * Columns of the block table to retrieve from the API
-     * 
-     * @return table columns
-     */
-    private String getBlocksColumns() {
-        return "hash,predecessor,baker,height,cycle,is_cycle_snapshot,time,solvetime,version,round,nonce,voting_period_kind,n_endorsed_slots,n_ops_applied,n_ops_failed,volume,fee,reward,deposit,activated_supply,burned_supply,n_accounts,n_new_accounts,n_new_contracts,n_cleared_accounts,n_funded_accounts,gas_limit,gas_used,storage_paid,pct_account_reuse,n_events,lb_esc_vote,lb_esc_ema";
+    public Operation getLastOperation() throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/op?columns=" + getOperationsColumns()
+                    + "&limit=1&order=desc");
+            List<Operation> operations = convertJsonList(json, Operation.class, new TypeReference<List<Operation>>() {
+            }, new OperationTableDeserializer());
+            if (operations.isEmpty())
+                throw new IOException("Failed to get last operation");
+            return operations.get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get last operation");
+        }
     }
 
     /**
@@ -321,7 +364,7 @@ public class TezosClient {
      * @return string of columns names for the operations table API
      */
     private String getOperationsColumns() {
-        return "type,hash,height,cycle,time,op_n,op_p,status,is_success,is_contract,is_internal,is_event,counter,gas_limit,gas_used,storage_limit,storage_paid,volume,fee,reward,deposit,burned,sender_id,receiver_id,creator_id,baker_id,data,parameters,storage,big_map_diff,errors,days_destroyed,sender,receiver,creator,baker,block,entrypoint";
+        return "row_id,type,hash,height,cycle,time,op_n,op_p,status,is_success,is_contract,is_internal,is_event,counter,gas_limit,gas_used,storage_limit,storage_paid,volume,fee,reward,deposit,burned,sender_id,receiver_id,creator_id,baker_id,data,parameters,storage,big_map_diff,errors,days_destroyed,sender,receiver,creator,baker,block,entrypoint";
     }
 
     /**

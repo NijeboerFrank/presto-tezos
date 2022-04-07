@@ -36,3 +36,4 @@ buildNumber.properties
 
 .idea/
 *.iml
+.vscode

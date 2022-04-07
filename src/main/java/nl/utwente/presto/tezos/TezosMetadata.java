@@ -68,6 +68,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                     case "block_height":
                     case "election_id":
                     case "proposal_id":
+                    case "operation_id":
                         // Limit query to block number range
                         orderedRanges.forEach(r -> {
                             Marker low = r.getLow();
@@ -77,6 +78,7 @@ public class TezosMetadata extends BaseTezosMetadata {
                         break;
                     case "block_hash":
                     case "tx_blockHash":
+                    case "operation_hash":
                         // Limit query to block hash range
                         orderedRanges.stream()
                                 .filter(Range::isSingleValue).forEach(r -> {
