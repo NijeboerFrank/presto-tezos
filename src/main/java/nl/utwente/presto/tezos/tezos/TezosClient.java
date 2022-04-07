@@ -97,7 +97,6 @@ public class TezosClient {
      * @throws IOException if blocks failed to retrieve
      */
     public List<Block> getBlocks(long start, long end) throws IOException {
-        System.out.println("Getting blocks " + start + " - " + end);
         try {
             String json = doGetRequest(
                     endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.gte=" + start + "&height.lte=" + end);

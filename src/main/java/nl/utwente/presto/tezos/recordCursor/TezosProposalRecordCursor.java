@@ -1,12 +1,9 @@
 package nl.utwente.presto.tezos.recordCursor;
 
 import com.google.common.collect.ImmutableList;
-import io.airlift.log.Logger;
-import nl.utwente.presto.tezos.TezosMetadata;
 import nl.utwente.presto.tezos.TezosTable;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.tezos.Proposal;
-import nl.utwente.presto.tezos.tezos.TezosClient;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -14,14 +11,11 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class TezosProposalRecordCursor extends BaseTezosRecordCursor {
-    private static final Logger log = Logger.get(TezosBlockRecordCursor.class);
-
     private final Iterator<Proposal> proposalIter;
 
     private final TezosTable table;
 
-    public TezosProposalRecordCursor(List<TezosColumnHandle> columnHandles, Proposal proposal, TezosTable table,
-            TezosClient tezosClient) {
+    public TezosProposalRecordCursor(List<TezosColumnHandle> columnHandles, Proposal proposal, TezosTable table) {
 
         super(columnHandles);
 

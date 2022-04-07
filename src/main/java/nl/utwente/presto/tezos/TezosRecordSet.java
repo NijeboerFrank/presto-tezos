@@ -4,7 +4,6 @@ import com.facebook.presto.common.type.Type;
 import com.facebook.presto.spi.RecordCursor;
 import com.facebook.presto.spi.RecordSet;
 import com.google.common.collect.ImmutableList;
-import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.recordCursor.TezosBlockRecordCursor;
 import nl.utwente.presto.tezos.recordCursor.TezosElectionRecordCursor;
@@ -17,20 +16,15 @@ import nl.utwente.presto.tezos.tezos.TezosClient;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 import static java.util.Objects.requireNonNull;
 
 public class TezosRecordSet implements RecordSet {
-    private static final Logger log = Logger.get(TezosRecordSet.class);
-
     private final TezosSplit split;
     private final TezosClient tezosClient;
 
     private final List<TezosColumnHandle> columnHandles;
     private final List<Type> columnTypes;
-
-    private long index = 0;
 
     TezosRecordSet(TezosClient tezosClient, List<TezosColumnHandle> columnHandles, TezosSplit split) {
         this.split = requireNonNull(split, "split is null");
@@ -66,7 +60,7 @@ public class TezosRecordSet implements RecordSet {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return new TezosBlockRecordCursor(columnHandles, blocks, split.getTable(), tezosClient);
+                return new TezosBlockRecordCursor(columnHandles, blocks, split.getTable());
             case ELECTION:
                 Election election = null;
                 try {
@@ -74,7 +68,7 @@ public class TezosRecordSet implements RecordSet {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return new TezosElectionRecordCursor(columnHandles, election, split.getTable(), tezosClient);
+                return new TezosElectionRecordCursor(columnHandles, election, split.getTable());
             case PROPOSAL:
                 Proposal proposal = null;
                 try {
@@ -82,7 +76,7 @@ public class TezosRecordSet implements RecordSet {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return new TezosProposalRecordCursor(columnHandles, proposal, split.getTable(), tezosClient);
+                return new TezosProposalRecordCursor(columnHandles, proposal, split.getTable());
             default:
                 return null;
         }

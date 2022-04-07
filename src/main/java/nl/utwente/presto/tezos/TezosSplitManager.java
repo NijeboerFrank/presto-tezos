@@ -3,7 +3,6 @@ package nl.utwente.presto.tezos;
 import com.facebook.presto.spi.*;
 import com.facebook.presto.spi.connector.ConnectorSplitManager;
 import com.facebook.presto.spi.connector.ConnectorTransactionHandle;
-import com.google.common.collect.ImmutableList;
 import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.connector.TezosConnectorConfig;
 import nl.utwente.presto.tezos.handle.TezosTableLayoutHandle;
