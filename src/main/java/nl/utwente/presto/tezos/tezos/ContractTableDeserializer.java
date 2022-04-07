@@ -15,8 +15,22 @@ public class ContractTableDeserializer extends JsonDeserializer<Contract> {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         Iterator<JsonNode> iterator = node.elements();
         return new Contract(
+                iterator.next().asLong(), // row_id
+                iterator.next().asText(), // address
                 iterator.next().asLong(), // account_id
-                iterator.next().asText(), //address
+                iterator.next().asLong(), // creator_id
+                iterator.next().asLong(), // first_seen
+                iterator.next().asLong(), // last_seen
+                iterator.next().asLong(), // storage_size
+                iterator.next().asLong(), // storage_paid
+                iterator.next().asText(), // script
+                iterator.next().asText(), // storage
+                iterator.next().asText(), // iface_hash
+                iterator.next().asText(), // code_hash
+                iterator.next().asText(), // storage_hash
+                iterator.next().asText(), // call_stats
+                iterator.next().asText(), // features
+                iterator.next().asText(), // interfacesa
                 iterator.next().asText() //creator
         );
     }

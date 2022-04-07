@@ -50,12 +50,11 @@ public class TezosSplitManager implements ConnectorSplitManager {
         TezosTable table = TezosTable.valueOf(tableLayoutHandle.getTable().getTableName().toUpperCase());
 
         try {
-            long lastBlockNumber = tezosClient.getLastBlockNumber();
-            log.info("current block number: " + lastBlockNumber);
-
             List<ConnectorSplit> connectorSplits;
             switch (table) {
                 case BLOCK:
+                    long lastBlockNumber = tezosClient.getLastBlockNumber();
+                    log.info("current block number: " + lastBlockNumber);
                     if (tableLayoutHandle.getRanges().isEmpty()) {
                         connectorSplits = LongStream.range(0, lastBlockNumber + 1)
                                 .mapToObj(TezosSplit::forBlock)
@@ -85,6 +84,23 @@ public class TezosSplitManager implements ConnectorSplitManager {
                                         blockRange.getStart(),
                                         blockRange.getEnd() == -1 ? lastElection : blockRange.getEnd() + 1).boxed())
                                 .map(TezosSplit::forElection)
+                                .collect(Collectors.toList());
+                    }
+                    log.info("Built %d splits", connectorSplits.size());
+                    return new FixedSplitSource(connectorSplits);
+                case CONTRACT:
+                    long lastContract = tezosClient.getLastContract().getRow_id();
+                    if (tableLayoutHandle.getRanges().isEmpty()) {
+                        connectorSplits = LongStream.range(0, lastContract + 1)
+                                .mapToObj(TezosSplit::forContract)
+                                .collect(Collectors.toList());
+                    } else {
+                        connectorSplits = tableLayoutHandle.getRanges()
+                                .stream()
+                                .flatMap(blockRange -> LongStream.range(
+                                        blockRange.getStart(),
+                                        blockRange.getEnd() == -1 ? lastContract : blockRange.getEnd() + 1).boxed())
+                                .map(TezosSplit::forContract)
                                 .collect(Collectors.toList());
                     }
                     log.info("Built %d splits", connectorSplits.size());

@@ -18,12 +18,14 @@ public class TezosSplit implements ConnectorSplit {
     private final long electionId;
     private final long proposalId;
 
+
     @JsonCreator
     public TezosSplit(
             @JsonProperty("table") TezosTable table,
             @JsonProperty("blockId") long blockId,
             @JsonProperty("electionId") long electionId,
-            @JsonProperty("proposalId") long proposalId) {
+            @JsonProperty("proposalId") long proposalId)
+    {
         this.table = table;
         this.blockId = blockId;
         this.electionId = electionId;
@@ -40,6 +42,10 @@ public class TezosSplit implements ConnectorSplit {
 
     public static TezosSplit forElection(long electionId) {
         return new TezosSplit(TezosTable.ELECTION, 0, electionId, 0);
+    }
+    public
+    static TezosSplit forContract(long block_height) { //TODO slaat nog nergens op
+        return new TezosSplit(TezosTable.CONTRACT, block_height, 0, 0);
     }
 
     @JsonProperty

@@ -14,17 +14,25 @@ import java.time.Instant;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Contract {
-    private long account_id;
+    private long row_id;
     private String address;
+    private long account_id;
+    private long creator_id;
+    private long first_seen;
+    private long last_seen;
+    private long storage_size;
+    private long storage_paid;
+    private String script;
+    private String storage;
+    private String iface_hash;
+    private String code_hash;
+    private String storage_hash;
+    private String call_stats;
+    private String features;
+    private String interfaces;
     private String creator;
 
     public Contract getContract() {
         return this;
     }
-
-    public Number getAccount_ID() {
-        return this.account_id;
-    }
-
-    public String getAddress() {return this.address;}
 }

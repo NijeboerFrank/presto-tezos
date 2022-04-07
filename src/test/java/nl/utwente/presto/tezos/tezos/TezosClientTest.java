@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TezosClientTest {
     @Test
@@ -28,9 +27,15 @@ public class TezosClientTest {
     public void testContract() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
         Contract contract = tezosClient.getContract("KT1Puc9St8wdNoGtLiD2WXaHbWU7styaxYhD");
-        assertEquals(818425L, contract.getAccount_ID());
+        assertEquals(818425L, contract.getAccount_id());
     }
 
+    @Test
+    public void testLastContract() throws IOException {
+        TezosClient tezosClient = new TezosClient("https://api.tzstats.com");
+        Contract contract = tezosClient.getLastContract();
+        assertNotNull(contract);
+    }
     @Test
     public void testElections() throws IOException {
         TezosClient tezosClient = new TezosClient("https://api.tzstats.com");

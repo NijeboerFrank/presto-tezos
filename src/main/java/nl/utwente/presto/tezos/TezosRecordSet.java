@@ -6,6 +6,7 @@ import com.facebook.presto.spi.RecordSet;
 import io.airlift.log.Logger;
 import nl.utwente.presto.tezos.handle.TezosColumnHandle;
 import nl.utwente.presto.tezos.tezos.Block;
+import nl.utwente.presto.tezos.tezos.Contract;
 import nl.utwente.presto.tezos.tezos.Election;
 import nl.utwente.presto.tezos.tezos.TezosClient;
 
@@ -61,6 +62,14 @@ public class TezosRecordSet implements RecordSet {
                     e.printStackTrace();
                 }
                 return new TezosElectionRecordCursor(columnHandles, election, split.getTable(), tezosClient);
+            case CONTRACT:
+                Contract contract = null;
+                try {
+                    contract = tezosClient.getContract(split.getBlockId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return new TezosContractRecordCursor(columnHandles, contract, split.getTable(), tezosClient);
             default:
                 return null;
         }

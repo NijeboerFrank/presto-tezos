@@ -53,7 +53,7 @@ public class TezosClient {
                     endpoint + "/tables/block?columns=" + getBlocksColumns() + "&limit=50000&height.in=" + heightsIn);
             return new ObjectMapper()
                     .registerModule(new SimpleModule()
-                            .addDeserializer(Block.class, new BlockTableDeserializer())
+                            .addDeserializer(Block.class, new BlockTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                     .reader()
                     .forType(new TypeReference<List<Block>>() {
@@ -90,6 +90,9 @@ public class TezosClient {
 
     private String getElectionColumns() {
         return "row_id,proposal_id,num_periods,num_proposals,voting_period,start_time,end_time,start_height,end_height,is_empty,is_open,is_failed,no_quorum,no_majority,proposal,last_voting_period";
+    }
+    private String getContractColumns() {
+        return "row_id,address,account_id,creator_id,first_seen,last_seen,storage_size,storage_paid,script,storage,iface_hash,code_hash,storage_hash,call_stats,features,interfaces,creator";
     }
 
     public Election getElection(long electionId) throws IOException {
@@ -155,15 +158,70 @@ public class TezosClient {
         }
     }
 
+    public Contract getContract(long row_id) throws IOException{
+        try {
+            String json = doGetRequest(endpoint+"/tables/contract?columns=" + getContractColumns() + "/row_id=" + row_id);
+            List<Contract> resp = new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Contract.class, new ContractTableDeserializer()))
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .reader()
+                    .forType(new TypeReference<List<Contract>>() {
+                    })
+                    .readValue(json);
+            if (resp.size() > 0) {
+                return resp.get(0);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get contract with row_id " +row_id);
+        }
+
+    }
+
     public Contract getContract(String hash) throws IOException{
         try {
-            String json = doGetRequest(endpoint+"/explorer/contract/"+hash);
-            return new ObjectMapper()
+            String json = doGetRequest(endpoint+"/tables/contract?columns=" + getContractColumns() +"&limit=50000&address="+hash);
+            List<Contract> resp = new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Contract.class, new ContractTableDeserializer()))
                     .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
-                    .readValue(json,  Contract.class);
+                    .reader()
+                    .forType(new TypeReference<List<Contract>>() {
+                    })
+                    .readValue(json);
+            if (resp.size() > 0) {
+                return resp.get(0);
+            } else {
+                return null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to get contract " +hash);
+        }
+    }
+
+    public Contract getLastContract() throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/tables/contract?columns="+ getContractColumns() +"&limit=1&order=desc");
+            List<Contract> resp = new ObjectMapper()
+                    .registerModule(new SimpleModule()
+                            .addDeserializer(Contract.class, new ContractTableDeserializer()))
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .reader()
+                    .forType(new TypeReference<List<Contract>>() {
+                    })
+                    .readValue(json);
+            if (resp.size() > 0) {
+                return resp.get(resp.size() - 1);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get contract head");
         }
     }
     private String doGetRequest(String url) throws Exception {
