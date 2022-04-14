@@ -507,6 +507,25 @@ public class TezosClient {
     }
 
     /**
+     * Get an account by its address
+     *
+     * @param hash address hash
+     * @return account
+     * @throws IOException if account failed to retrieve
+     */
+    public Account getAccount(String hash) throws IOException {
+        try {
+            String json = doGetRequest(endpoint + "/explorer/account/" + hash);
+            return new ObjectMapper()
+                    .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+                    .readValue(json, Account.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to get account " + hash);
+        }
+    }
+
+    /**
      * Convert a JSON string into a list of objects
      *
      * @param json         JSON string
