@@ -31,23 +31,14 @@ Specify a block range where you can (e.g. `WHERE block.block_number > x AND bloc
     ```
     connector.name=tezos
 
-    # You can connect through Tezos HTTP JSON RPC endpoint
-    # IMPORTANT - for local testing start geth with rpcport
-    # geth --rpc --rpcaddr "127.0.0.1" --rpcport "8545"
-    tezos.jsonrpc=http://localhost:8545/
-
-
-    # Or you can connect through IPC socket
-    # tezos.ipc=/path/to/ipc_socketfile
-
-    # Or you can connect to Infura
-    # tezos.infura=https://mainnet.infura.io/<your_token>
+    # The endpoint to which you want to connect. Can be either
+    # https://api.tzstats.com if you want to test quickly, but can also be
+    # a local instance of the tzindex project.
+    tezos.endpoint=https://api.tzstats.com
     ```
     b. Copy and extract the built plugin to your presto plugin folder  
     ```
-    $ mkdir -p plugin/tezos \
-      && cp <path_to_this_repo>/target/presto-tezos-*-plugin.tar.gz . \
-      && tar xfz presto-tezos-*-plugin.tar.gz -C plugin/tezos --strip-components=1
+    $ ./deploy.sh <path to your presto-server directory>
     ```  
 
     By the end of this step, your presto installation folder structure should look like:  
@@ -69,144 +60,5 @@ Specify a block range where you can (e.g. `WHERE block.block_number > x AND bloc
   $ bin/launcher start
   $ presto-cli --server localhost:8080 --catalog tezos --schema default
   ```
-
-### Use Cases
-Inspired by [An Analysis of the First 100000 Blocks](https://blog.tezos.org/2015/08/18/frontier-first-100k-blocks/), the following SQL queries capture partially what was depicted in that post.  
-
-- The first 50 block times (in seconds)
-```sql
-SELECT b.bn, (b.block_timestamp - a.block_timestamp) AS delta
-FROM
-    (SELECT block_number AS bn, block_timestamp
-    FROM block
-    WHERE block_number>=1 AND block_number<=50) AS a
-JOIN
-    (SELECT (block_number-1) AS bn, block_timestamp
-    FROM block
-    WHERE block_number>=2 AND block_number<=51) AS b
-ON a.bn=b.bn
-ORDER BY b.bn;
-```
-- Average block time (every 200th block from genesis to block 10000)
-```sql
-WITH
-X AS (SELECT b.bn, (b.block_timestamp - a.block_timestamp) AS delta
-        FROM
-            (SELECT block_number AS bn, block_timestamp
-            FROM block
-            WHERE block_number>=1 AND block_number<=10000) AS a
-        JOIN
-            (SELECT (block_number-1) AS bn, block_timestamp
-            FROM block
-            WHERE block_number>=2 AND block_number<=10001) AS b
-        ON a.bn=b.bn
-        ORDER BY b.bn)
-SELECT min(bn) AS chunkStart, avg(delta)
-FROM
-    (SELECT ntile(10000/200) OVER (ORDER BY bn) AS chunk, * FROM X) AS T
-GROUP BY chunk
-ORDER BY chunkStart;
-```
-- Biggest miners in first 100k blocks (address, blocks, %)
-```sql
-SELECT block_miner, count(*) AS num, count(*)/100000.0 AS PERCENT
-FROM block
-WHERE block_number<=100000
-GROUP BY block_miner
-ORDER BY num DESC
-LIMIT 15;
-```
-- ERC20 Token Movement in the last 100 blocks
-```sql
-SELECT erc20_token, SUM(erc20_value) FROM erc20
-WHERE erc20_blocknumber >= 4147340 AND erc20_blocknumber<=4147350
-GROUP BY erc20_token;
-```
-- Describe the database structure
-```sql
-SHOW TABLES;
-    Table
--------------
- block
- erc20
- transaction
-
-DESCRIBE block;
-Column                 | Type               | Extra | Comment
------------------------------------------------------------
-block_number           | bigint             |       |
-block_hash             | varchar(66)        |       |
-block_parenthash       | varchar(66)        |       |
-block_nonce            | varchar(18)        |       |
-block_sha3uncles       | varchar(66)        |       |
-block_logsbloom        | varchar(514)       |       |
-block_transactionsroot | varchar(66)        |       |
-block_stateroot        | varchar(66)        |       |
-block_miner            | varchar(42)        |       |
-block_difficulty       | bigint             |       |
-block_totaldifficulty  | bigint             |       |
-block_size             | integer            |       |
-block_extradata        | varchar            |       |
-block_gaslimit         | double             |       |
-block_gasused          | double             |       |
-block_timestamp        | bigint             |       |
-block_transactions     | array(varchar(66)) |       |
-block_uncles           | array(varchar(66)) |       |
-
-
-DESCRIBE transaction;
-
-Column              |    Type     | Extra | Comment
---------------------------------------------------
-tx_hash             | varchar(66) |       |
-tx_nonce            | bigint      |       |
-tx_blockhash        | varchar(66) |       |
-tx_blocknumber      | bigint      |       |
-tx_transactionindex | integer     |       |
-tx_from             | varchar(42) |       |
-tx_to               | varchar(42) |       |
-tx_value            | double      |       |
-tx_gas              | double      |       |
-tx_gasprice         | double      |       |
-tx_input            | varchar     |       |
-
-
-DESCRIBE erc20;
-      Column       |    Type     | Extra | Comment
--------------------+-------------+-------+---------
- erc20_token       | varchar     |       |
- erc20_from        | varchar(42) |       |
- erc20_to          | varchar(42) |       |
- erc20_value       | double      |       |
- erc20_txhash      | varchar(66) |       |
- erc20_blocknumber | bigint      |       |
-```
-
-### Web3 Functions
-In addition to the various built-in [Presto functions](https://prestodb.io/docs/current/functions.html), some web3 functions are ported so that they can be called inline with SQL statements directly. Currently, the supported web3 functions are
-1. [fromWei](https://github.com/tezos/wiki/wiki/JavaScript-API#web3fromwei)
-1. [toWei](https://github.com/tezos/wiki/wiki/JavaScript-API#web3towei)
-1. [eth_gasPrice](https://github.com/tezos/wiki/wiki/JavaScript-API#web3ethgasprice)
-1. [eth_blockNumber](https://github.com/tezos/wiki/wiki/JavaScript-API#web3ethblocknumber)
-1. [eth_getBalance](https://github.com/tezos/wiki/wiki/JavaScript-API#web3ethgetbalance)
-1. [eth_getTransactionCount](https://github.com/tezos/wiki/wiki/JavaScript-API#web3ethgettransactioncount)
-
-### Troubleshooting
-
-* You must use python2. You will get invalid syntax errors if you use Python3.
-```
--> bin/launcher start
-  File "/your_path/presto-server-0.196/bin/launcher.py", line 38
-    except OSError, e:
-                  ^
-SyntaxError: invalid syntax
-```
-
-* Use Java 8 only. You might get the following errors if you use the wrong Java version.
-
-```
-Unrecognized VM option 'ExitOnOutOfMemoryError'
-Did you mean 'OnOutOfMemoryError=<value>'?
-Error: Could not create the Java Virtual Machine.
-Error: A fatal exception has occurred. Program will exit.
-```
+### Example Queries
+TODO
