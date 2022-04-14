@@ -65,7 +65,7 @@ Inspired by [An Analysis of the First 100000 Blocks](https://blog.ethereum.org/2
 
 - The first 50 block times (in seconds)
 ```sql
-SELECT b.id, (b.block_time - a.block_time) AS delta
+SELECT b.id, (to_unixtime(b.block_time) - to_unixtime(a.block_time)) AS delta
 FROM
     (SELECT block_height AS id, block_time
      FROM block
@@ -81,7 +81,7 @@ ORDER BY b.id;
 - Average block time (every 200th block from genesis to block 10000)
 ```sql
 WITH
-X AS (SELECT b.id, (b.block_time - a.block_time) AS delta
+X AS (SELECT b.id, (to_unixtime(b.block_time) - to_unixtime(a.block_time)) AS delta
         FROM
             (SELECT block_height AS id, block_time
             FROM block
