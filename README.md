@@ -60,7 +60,9 @@ Specify a block range where you can (e.g. `WHERE block.block_height > x AND bloc
   $ bin/launcher start
   $ presto-cli --server localhost:8080 --catalog tezos --schema default
   ```
+
 ### Example Queries
+
 Inspired by [An Analysis of the First 100000 Blocks](https://blog.ethereum.org/2015/08/18/frontier-first-100k-blocks/), the following SQL queries capture partially what was depicted in that post.
 
 - The first 50 block times (in seconds)
@@ -257,3 +259,12 @@ DESCRIBE proposal;
  proposal_source       | varchar |       |
  proposal_op           | varchar |       |
 ```
+
+  
+### Functions
+In addition to the various built-in Presto functions, this plugin also adds some functions that can be called inline with SQL statements directly. Currently, the supported functions are:
+1. `tezos_blockHeight()` - Returns the height of the latest block
+2. `tezos_getBalance('tz...')` - Get the current balance of an account
+3. `tezos_getTransactionCount('tz...')` - Get the number of transactions sent and received by an account
+4. `fromMutez(1)` - Convert a currency value in mutez to tez
+4. `toMutez(1)` - Convert a currency value in tez to mutez
